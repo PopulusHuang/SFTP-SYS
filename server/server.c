@@ -1,18 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <string.h>
 #include <sys/types.h>
+#include <unistd.h>
+#include <fcntl.h>
+#if 0
+#include <string.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
-#include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#endif
 #include "../../share/ssl_wrap.h"
 #include "../../share/sock_wrap.h"
 #define MAXBUF 1024
@@ -98,20 +100,37 @@ void write_data(SSL *ssl,char *buf,int fd)
       }
     }
 }
-int socket_init(int lisnum,struct sockaddr_in *servaddr,char **argv)
+int socket_init(int lisnum,char **argv)
 {
   int sockfd;
+  struct sockaddr_in servaddr;
   sockfd = Socket(PF_INET, SOCK_STREAM, 0);
-  bzero((const char*)servaddr, strlen((char *)servaddr));
-  servaddr->sin_family = PF_INET;
-  servaddr->sin_port = htons(SERV_PORT);
+  bzero(&servaddr, sizeof(servaddr));
+  servaddr.sin_family = PF_INET;
+  servaddr.sin_port = htons(SERV_PORT);
   if (argv[3])
-    servaddr->sin_addr.s_addr = inet_addr(argv[3]);
+    servaddr.sin_addr.s_addr = inet_addr(argv[3]);
   else
-    servaddr->sin_addr.s_addr = INADDR_ANY;
-	Bind(sockfd, (struct sockaddr *)servaddr, sizeof(struct sockaddr));
+    servaddr.sin_addr.s_addr = INADDR_ANY;
+	Bind(sockfd, (struct sockaddr *)&servaddr, sizeof(struct sockaddr));
 	Listen(sockfd, lisnum);
   return sockfd;
+}
+/* Load the user's digital certificate that 
+ * is used to send to the client. 
+ * A certificate containing a public key*/
+void ssl_load_cert_priv(SSL_CTX *ctx)
+{
+  char certpwd[100];
+  char privpwd[100];
+  char *certificate;
+  char *privkey;
+  Getcwd(certpwd,100);
+  certificate=strcat(certpwd,"/cacert.pem");
+  Getcwd(privpwd,100);
+  privkey=strcat(privpwd,"/privkey.pem");
+  ssl_load_pk(ctx,certificate,privkey);
+
 }
 int main(int argc, char **argv)
 {
@@ -123,11 +142,6 @@ int main(int argc, char **argv)
   char new_fileName[50]="client_file/";
   char *fdir="client_file";		/*receive file's path*/
   SSL_CTX *ctx; /*SSL Content Text*/
-  char certpwd[100];
-  char privpwd[100];
-  char *certificate;
-  char *privkey;
-
   arg_init(argv,&lisnum,&myport);
 #if 1
   SSL_library_init();
@@ -149,23 +163,23 @@ int main(int argc, char **argv)
   create_recvdir(fdir);
 
   puts("recvdir init");
-  /* 载入用户的数字证书， 此证书用来发送给客户端。 证书里包含有公钥 */
-  Getcwd(certpwd,100);
-  certificate=strcat(certpwd,"/cacert.pem");
-  Getcwd(privpwd,100);
-  privkey=strcat(privpwd,"/privkey.pem");
-  ssl_load_pk(ctx,certificate,privkey);
-
+  ssl_load_cert_priv(ctx);
   /*--------------------- 开启一个 socket 监听---------------------------*/
-  sockfd = socket_init(lisnum ,&my_addr,argv);
+  sockfd = socket_init(lisnum,argv);
 
   /* Accept client connection */
+  int pid;
   while (1)
   {
     SSL *ssl;
     len = sizeof(struct sockaddr);
 	  new_fd = Accept(sockfd, (struct sockaddr *) &their_addr, &len);
       printf("server: got connection from %s, port %d, socket %d\n", inet_ntoa(their_addr.sin_addr), ntohs(their_addr.sin_port), new_fd);
+	pid = fork();
+	if(pid < 0)
+	{
+		perror("call to fork");
+	}else if(pid == 0){
 
     ssl = SSL_new(ctx);
     /* insert user's socket to SSL */
@@ -187,7 +201,10 @@ int main(int argc, char **argv)
     SSL_shutdown(ssl);  /* close ssl connection */
     SSL_free(ssl);		/* free ssl */
     close(new_fd);		/* close client socket */
+  }else{
+ 	close(new_fd); 
   }
+}
 
   /* 关闭监听的 socket */
   close(sockfd);
