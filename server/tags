@@ -1,0 +1,28 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+CC	Makefile	/^CC=gcc$/;"	m
+CFLAGS	Makefile	/^CFLAGS= -lssl -lcrypto -g$/;"	m
+Epoll_wait	myepoll.c	/^int Epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)$/;"	f
+Event_add	myepoll.c	/^int Event_add(int epfd,int listenfd,struct epoll_event *ev)$/;"	f
+Getcwd	server.c	/^void Getcwd(char *pwd,int size)$/;"	f
+MAXBUF	server.c	10;"	d	file:
+MAXEPOLLSIZE	server.c	12;"	d	file:
+SERV_PORT	server.c	11;"	d	file:
+_MYEPOLL_H_	myepoll.h	2;"	d
+arg_init	server.c	/^void arg_init(char **argv,int *lisnum,int *myport)$/;"	f
+create_recvdir	server.c	/^void create_recvdir(char *fdir)$/;"	f
+create_recvfile	server.c	/^int create_recvfile(SSL *ssl,char *new_filePath,char *buf)$/;"	f
+main	server.c	/^int main(int argc, char **argv)$/;"	f
+obj_epoll	Makefile	/^obj_epoll=myepoll.o$/;"	m
+obj_sock	Makefile	/^obj_sock=..\/..\/share\/sock_wrap.o$/;"	m
+obj_srv	Makefile	/^obj_srv=server.o $/;"	m
+obj_ssl	Makefile	/^obj_ssl=..\/..\/share\/ssl_wrap.o$/;"	m
+recv_file	server.c	/^int recv_file(int new_connfd,SSL_CTX *ctx)$/;"	f
+setnonblocking	myepoll.c	/^int setnonblocking(int sockfd)$/;"	f
+socket_init	server.c	/^int socket_init(int lisnum,char **argv)$/;"	f
+ssl_load_cert_priv	server.c	/^void ssl_load_cert_priv(SSL_CTX *ctx)$/;"	f
+write_data	server.c	/^void write_data(SSL *ssl,char *buf,int fd)$/;"	f
