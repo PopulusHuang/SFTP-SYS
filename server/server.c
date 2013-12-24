@@ -9,6 +9,7 @@
 #include "myepoll.h"
 #define MAXBUF 1024
 #define SERV_PORT 7838
+#define MAX_EVENT 100
 void Getcwd(char *pwd,int size)
 {
 	getcwd(pwd,size);
@@ -36,8 +37,9 @@ void arg_init(char **argv,int *lisnum,int *myport)
   }
 }
 /* create the receive directly */
-void create_recvdir(char *fdir)
+void create_recvdir()
 {
+  char *fdir="client_file";		/*receive file's path*/
   mode_t mode;
   mode=0755;
   /*Is the directly exist*/
@@ -46,6 +48,7 @@ void create_recvdir(char *fdir)
   	mkdir(fdir,mode);
   }
 }
+/* receive file name from client,and create an empty file with it*/
 int create_recvfile(SSL *ssl,char *new_fileName,char *buf)
 {
 	int n = 0;
@@ -53,7 +56,7 @@ int create_recvfile(SSL *ssl,char *new_fileName,char *buf)
 	n = strlen(new_fileName);
     bzero(buf, MAXBUF + 1);
     bzero(new_fileName+n, n);
-    n = SSL_read(ssl, buf, MAXBUF);	/* read the file name */
+    n = SSL_read(ssl, buf, MAXBUF);	/* read the file name from client */
     if(n == 0)
       printf("Receive File Name '%s'Complete !\n",buf);
     else if(n < 0)
@@ -61,12 +64,13 @@ int create_recvfile(SSL *ssl,char *new_fileName,char *buf)
     if((fd = open(strcat(new_fileName,buf),O_CREAT | O_TRUNC | O_RDWR,0666))<0)
     {
       perror("open:");
-      exit(1);
+	  return -1;
     }
 	printf("open file:%s succeed\n",new_fileName);
 	return fd;
 }
-void write_data(SSL *ssl,char *buf,int fd)
+/* write data to the empty file */
+int write_data(SSL *ssl,char *buf,int fd)
 {
 	int len;
     while(1)
@@ -81,20 +85,23 @@ void write_data(SSL *ssl,char *buf,int fd)
       else if(len < 0)
       {
         printf("Failure to receive message ! Error code is %d，Error messages are '%s'\n", errno, strerror(errno));
-        exit(1);
+		return -1;
       }
       if(write(fd,buf,len)<0)	/* write data to server */
       {
         perror("write:");
-        exit(1);
+		return -1;
       }
     }
+	return 0;
 }
 int socket_init(int lisnum,char **argv)
 {
   int sockfd;
   struct sockaddr_in servaddr;
   sockfd = Socket(PF_INET, SOCK_STREAM, 0);
+//  setnonblocking(sockfd);
+
   bzero(&servaddr, sizeof(servaddr));
   servaddr.sin_family = PF_INET;
   servaddr.sin_port = htons(SERV_PORT);
@@ -122,12 +129,14 @@ void ssl_load_cert_priv(SSL_CTX *ctx)
   ssl_load_pk(ctx,certificate,privkey);
 
 }
-int recv_file(int connfd,SSL_CTX *ctx)
+/* receive file from the client */
+int recv_file(SSL *ssl,SSL_CTX *ctx)
 {
-	SSL *ssl;
 	int fd;
   	char buf[MAXBUF + 1]; /*add one space to save '\0'*/
     char new_fileName[50]="client_file/";
+#if 0
+	SSL *ssl;
     ssl = SSL_new(ctx);
     /* insert user's socket to SSL */
     SSL_set_fd(ssl, connfd);
@@ -137,15 +146,17 @@ int recv_file(int connfd,SSL_CTX *ctx)
       perror("accept");
       close(connfd);
     }
-
-    /* 接受客户端所传文件的文件名并在特定目录创建空文件 */
+#endif
+	/* receive file name from the client,
+	 * and create a empty file with it */
 	fd = create_recvfile(ssl,new_fileName,buf);
-    /* 接收客户端的数据并写入文件 */
-	write_data(ssl,buf,fd);
+	/* receive the client's data and write to the empty file*/
+	int n = write_data(ssl,buf,fd);
 
     close(fd); 	/* close file */
-    SSL_shutdown(ssl);  /* close ssl connection */
-    SSL_free(ssl);		/* free ssl */
+//    SSL_shutdown(ssl);  /* close ssl connection */
+ //   SSL_free(ssl);		/* free ssl */
+	return n ;
 
 }
 int main(int argc, char **argv)
@@ -154,73 +165,88 @@ int main(int argc, char **argv)
   socklen_t len;
   struct sockaddr_in my_addr, their_addr;
   unsigned int myport, lisnum; /*lisnum-Max listen number*/
-//  char buf[MAXBUF + 1]; /*add one space to save '\0'*/
- // char new_fileName[50]="client_file/";
-  char *fdir="client_file";		/*receive file's path*/
   SSL_CTX *ctx; /*SSL Content Text*/
+
   arg_init(argv,&lisnum,&myport);
 #if 1
   SSL_library_init();
  
   OpenSSL_add_all_algorithms();
-  /* 载入所有 SSL 错误消息 */
+  /* load all SSL error message */
   SSL_load_error_strings();
-  /* 以 SSL V2 和 V3 标准兼容方式产生一个 SSL_CTX ，即 SSL Content Text */
+  /* With SSL V2 and V3 compliant way to generate a SSL_CTX,
+   * You can also use SSLv2_server_method() or SSLv3_server_method() 
+   * alone represents V2 or V3 standard*/
   ctx = SSL_CTX_new(SSLv23_server_method());
-  /* 也可以用 SSLv2_server_method() 或 SSLv3_server_method() 单独表示 V2 或 V3标准 */
   if (ctx == NULL)
   {
     ERR_print_errors_fp(stdout);
     exit(1);
   }
 #endif
- // ssl_init_pk(ctx);
   puts("ssl init");
-  create_recvdir(fdir);
+  create_recvdir();
 
-  puts("recvdir init");
   ssl_load_cert_priv(ctx);
-  /*--------------------- 开启一个 socket 监听---------------------------*/
+  /*---------- setup a socket monitor-----------------*/
   sockfd = socket_init(lisnum,argv);
+  int i; 
+  int epfd;	/* epoll file describes */
+  int all_event_num ;/* event number*/
+  int cur_event_num = 1;/* current event number */
+  struct epoll_event ev;
+  struct epoll_event events[MAX_EVENT];	 
 
+  epfd = epoll_create(MAX_EVENT);
+  Event_add(epfd,sockfd,&ev);
   /* Accept client connection */
-  int pid;
+  len = sizeof(struct sockaddr);
+  SSL *ssl;
   while (1)
   {
-    SSL *ssl;
-    len = sizeof(struct sockaddr);
-	  connfd = Accept(sockfd, (struct sockaddr *) &their_addr, &len);
-      printf("server: got connection from %s, port %d, socket %d\n", inet_ntoa(their_addr.sin_addr), ntohs(their_addr.sin_port), connfd);
-		perror("call to fork");
-#if 0
-    ssl = SSL_new(ctx);
-    /* insert user's socket to SSL */
-    SSL_set_fd(ssl, connfd);
-    /* establish SSL connection */
-    if (SSL_accept(ssl) == -1)
-    {
-      perror("accept");
-      close(connfd);
-      break;
-    }
-
-    /* 接受客户端所传文件的文件名并在特定目录创建空文件 */
-	fd = create_recvfile(ssl,new_fileName,buf);
-    /* 接收客户端的数据并写入文件 */
-	write_data(ssl,buf,fd);
-
-    close(fd); 	/* close file */
-    SSL_shutdown(ssl);  /* close ssl connection */
-    SSL_free(ssl);		/* free ssl */
-#endif
-	recv_file(connfd,ctx);
-    close(connfd);		/* close client socket */
+	  /* wait for events */
+	  all_event_num = Epoll_wait(epfd,events,cur_event_num,-1);
+	  /* handl all events */
+	  for(i = 0;i < all_event_num;i++)
+	  {
+		  if(events[i].data.fd == sockfd)
+		  {
+	         int new_connfd = Accept(sockfd, (struct sockaddr *) &their_addr, &len);
+             printf("server: got connection from %s, port %d, socket %d\n", 
+			 inet_ntoa(their_addr.sin_addr), 
+			 ntohs(their_addr.sin_port), 
+			 new_connfd);
+    		ssl = SSL_new(ctx);
+		    /* insert user's socket to SSL */
+		    SSL_set_fd(ssl, new_connfd);
+		    /* establish SSL connection */
+		    if (SSL_accept(ssl) == -1)
+		    {
+		      perror("accept");
+    		  SSL_shutdown(ssl);  /* close ssl connection */
+   			  SSL_free(ssl);		/* free ssl */
+		      close(new_connfd);
+			  continue;
+		    }
+			 setnonblocking(new_connfd);
+			 Event_add(epfd,new_connfd,&ev);
+			 cur_event_num++;
+		  }else if(events[i].events&EPOLLIN)
+		  {
+			  connfd = events[i].data.fd; 
+			  int ret = recv_file(ssl,ctx);
+			  if(ret < 1 && errno != EAGAIN)
+			  {
+			 	epoll_ctl(epfd,EPOLL_CTL_DEL,connfd,&ev);
+				close(connfd);
+				cur_event_num--;
+			  }
+		  }
+    //close(connfd);		/* close client socket */
+	  }
   }
 
-
-  /* 关闭监听的 socket */
   close(sockfd);
-  /* 释放 CTX */
   SSL_CTX_free(ctx);
   return 0;
 }

@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/epoll.h>
+#include <stdlib.h>
 /* set the handle to nonblocking mode */
 int setnonblocking(int sockfd)
 {
@@ -22,7 +23,7 @@ int setnonblocking(int sockfd)
 }
 int Event_add(int epfd,int listenfd,struct epoll_event *ev)
 {
-    ev->events = EPOLLIN | EPOLLET;
+    ev->events = EPOLLIN | EPOLLET |EPOLLHUP;
     ev->data.fd = listenfd;
     if (epoll_ctl(epfd, EPOLL_CTL_ADD, listenfd, ev) < 0)
     {
@@ -41,7 +42,8 @@ int Epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	if (n == -1)
 	{
 		perror("epoll_wait");
-		return -1;
+		//return -1;
+		exit(1);
 	}
 	
 }
