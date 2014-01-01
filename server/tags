@@ -5,25 +5,40 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 CC	Makefile	/^CC=gcc$/;"	m
-CFLAGS	Makefile	/^CFLAGS= -lssl -lcrypto -g$/;"	m
+CFLAGS	Makefile	/^CFLAGS= -lssl -lcrypto -lsqlite3 -g $/;"	m
 Epoll_wait	myepoll.c	/^int Epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)$/;"	f
 Event_add	myepoll.c	/^int Event_add(int epfd,int listenfd,struct epoll_event *ev)$/;"	f
+FILENAME_SIZE	srv_parse.c	3;"	d	file:
 Getcwd	server.c	/^void Getcwd(char *pwd,int size)$/;"	f
-MAXBUF	server.c	10;"	d	file:
-MAX_EVENT	server.c	12;"	d	file:
-SERV_PORT	server.c	11;"	d	file:
+MAXBUF	server.c	9;"	d	file:
+MAX_EVENT	server.c	11;"	d	file:
+Mlogin	client_file/menu.c	/^int Mlogin(char *order)$/;"	f
+Mmain	client_file/menu.c	/^int Mmain(char *order)$/;"	f
+Moption	client_file/menu.c	/^int Moption(void)$/;"	f
+SERV_PORT	server.c	10;"	d	file:
+SRV_PARSE_H_	srv_parse.h	2;"	d
 _MENU_H_	client_file/menu.h	2;"	d
 _MYEPOLL_H_	myepoll.h	2;"	d
 arg_init	server.c	/^void arg_init(char **argv,int *lisnum,int *myport)$/;"	f
+clnt_login	srv_parse.c	/^int clnt_login(SSL *ssl,char *order,sqlite3 *db)$/;"	f
+clnt_register	srv_parse.c	/^int clnt_register(SSL *ssl,char *order,sqlite3 *db)$/;"	f
 create_recvdir	server.c	/^void create_recvdir()$/;"	f
 create_recvfile	server.c	/^int create_recvfile(SSL *ssl,char *new_fileName,char *buf)$/;"	f
+get_account	srv_parse.c	/^int get_account(SSL *ssl,char *order,ACK *ack,ACCOUNT *account)$/;"	f
 main	server.c	/^int main(int argc, char **argv)$/;"	f
+obj_account	Makefile	/^obj_account=..\/share\/account.o$/;"	m
+obj_all	Makefile	/^obj_all=$(obj_srv) $(obj_ssl) $(obj_sock) $(obj_epoll) $(obj_parse) $(obj_order) $(obj_account)$/;"	m
 obj_epoll	Makefile	/^obj_epoll=myepoll.o$/;"	m
+obj_order	Makefile	/^obj_order=..\/share\/order.o$/;"	m
+obj_parse	Makefile	/^obj_parse=srv_parse.o$/;"	m
 obj_sock	Makefile	/^obj_sock=..\/..\/share\/sock_wrap.o$/;"	m
 obj_srv	Makefile	/^obj_srv=server.o $/;"	m
 obj_ssl	Makefile	/^obj_ssl=..\/..\/share\/ssl_wrap.o$/;"	m
-recv_file	server.c	/^int recv_file(int connfd,SSL_CTX *ctx)$/;"	f
+parse_clnt	srv_parse.c	/^int parse_clnt(SSL *ssl,char *order,sqlite3 *db)$/;"	f
+recv_file	srv_parse.c	/^int recv_file(SSL *ssl,char *order)$/;"	f
+scan_files	srv_parse.c	/^int scan_files(SSL *ssl,char *order)$/;"	f
+send_file	srv_parse.c	/^int send_file(SSL *ssl,char *order)$/;"	f
 setnonblocking	myepoll.c	/^int setnonblocking(int sockfd)$/;"	f
 socket_init	server.c	/^int socket_init(int lisnum,char **argv)$/;"	f
 ssl_load_cert_priv	server.c	/^void ssl_load_cert_priv(SSL_CTX *ctx)$/;"	f
-write_data	server.c	/^void write_data(SSL *ssl,char *buf,int fd)$/;"	f
+write_data	server.c	/^int write_data(SSL *ssl,char *buf,int fd)$/;"	f

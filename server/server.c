@@ -4,8 +4,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "../../share/ssl_wrap.h"
-#include "../../share/sock_wrap.h"
+#include "srv_parse.h"
 #include "myepoll.h"
 #define MAXBUF 1024
 #define SERV_PORT 7838
@@ -130,7 +129,8 @@ void ssl_load_cert_priv(SSL_CTX *ctx)
 
 }
 /* receive file from the client */
-int recv_file(SSL *ssl,SSL_CTX *ctx)
+#if 0
+int recv_file(SSL *ssl)
 {
 	int fd;
   	char buf[MAXBUF + 1]; /*add one space to save '\0'*/
@@ -159,14 +159,27 @@ int recv_file(SSL *ssl,SSL_CTX *ctx)
 	return n ;
 
 }
+#endif
 int main(int argc, char **argv)
 {
   int sockfd, connfd, fd;
+  int ret;
+  char order[ORDER_SIZE];
   socklen_t len;
   struct sockaddr_in my_addr, their_addr;
   unsigned int myport, lisnum; /*lisnum-Max listen number*/
-  SSL_CTX *ctx; /*SSL Content Text*/
 
+  sqlite3 *db;
+ /* open database */ 
+	ret = sqlite3_open("./ssf.db",&db);
+	if(ret != SQLITE_OK)
+	{
+		fputs(sqlite3_errmsg(db),stderr);
+		fputs("\n",stderr);
+		exit(1);
+	}
+  SSL_CTX *ctx; /*SSL Content Text*/
+	
   arg_init(argv,&lisnum,&myport);
 #if 1
   SSL_library_init();
@@ -234,12 +247,18 @@ int main(int argc, char **argv)
 		  }else if(events[i].events&EPOLLIN)
 		  {
 			  connfd = events[i].data.fd; 
-			  int ret = recv_file(ssl,ctx);
-			  if(ret < 1 && errno != EAGAIN)
+			 // int ret = recv_file(ssl);
+			 SSL_read(ssl,order,ORDER_SIZE);
+			 ret = parse_clnt(ssl,order,db);
+			  if(ret == COUT && errno != EAGAIN)
 			  {
+#if 1
 			 	epoll_ctl(epfd,EPOLL_CTL_DEL,connfd,&ev);
 				close(connfd);
+				SSL_shutdown(ssl);
+				SSL_free(ssl);
 				cur_event_num--;
+#endif
 			  }
 		  }
     //close(connfd);		/* close client socket */

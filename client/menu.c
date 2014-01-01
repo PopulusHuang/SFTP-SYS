@@ -1,4 +1,5 @@
 #include "menu.h"
+#include "../share/order.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -8,6 +9,7 @@ int Moption(void)
 	int n;
 	printf("please input a number:");
 	scanf("%d",&n);
+	getchar();
 	return n;
 }
 /* print login menu */
@@ -21,7 +23,7 @@ loop:printf("\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
 #if 1
 	if (n < 3 && n > 0)
 	{
-		strncpy(order,order_set[n],strlen(order));
+		strcpy(order,*(order_set+n));
 	}
 	else
 	{
@@ -41,11 +43,11 @@ loop: printf("\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
 	  printf("\033[31m|  4. download files          |\033[0m\n");
 	  printf("\033[31m|  5. logout                  |\033[0m\n");
 	  printf("\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
-	int n = Moption() @ 2;	
+	int n = Moption() + 2;	
 #if 1
 	if (n < 8 && n > 2)
 	{
-		strncpy(order,order_set[n],strlen(order));
+		strcpy(order,*(order_set+n));
 	}
 	else
 	{
