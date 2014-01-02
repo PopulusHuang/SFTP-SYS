@@ -186,7 +186,8 @@ int main(int argc, char **argv)
 			 setnonblocking(new_connfd);
 			 Event_add(epfd,new_connfd,&ev);
 			 cur_event_num++;
-		  }else 
+		  }
+		  else 
 		  {
 			  connfd = events[i].data.fd; 
 			 // int ret = recv_file(ssl);
@@ -195,10 +196,10 @@ int main(int argc, char **argv)
 					 continue;
 			 ret = parse_clnt(ssl,data,db);
 			 bzero(data,sizeof(data));
-			  if((ret==COUT) || (nread==0)&& errno != EAGAIN)
+			  if(((ret==COUT) && (errno != EAGAIN))||(nread <= 0))
 			  {
 #if 1
-				printf("client logout");
+				printf("client logout\n");
 			 	epoll_ctl(epfd,EPOLL_CTL_DEL,connfd,&ev);
 				close(connfd);
 				SSL_shutdown(ssl);

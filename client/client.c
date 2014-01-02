@@ -107,10 +107,13 @@ int show_Mlogin(SSL *ssl)
 int show_Mmain(SSL *ssl)
 {
 	char order[ORDER_SIZE];
+	int n;
 	while(1)
 	{
 		Mmain(order);	
-		parse_clnt_order(ssl,order);
+		n = parse_clnt_order(ssl,order);
+		if(n == COUT)	/* client logout */
+			break;
 	}
 }
 int main(int argc, char **argv)
