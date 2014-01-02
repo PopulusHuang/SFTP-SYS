@@ -9,9 +9,9 @@
 #include <openssl/err.h>
 #include "../share/ssl_wrap.h"
 #include "../share/sock_wrap.h"
-#include "menu.h"
-#include "parse.h"
 #include "../share/order.h"
+#include "menu.h"
+#include "clnt_parse.h"
 #define MAXBUF 1024
 #define SERV_PORT 7838
 void ShowCerts(SSL * ssl)

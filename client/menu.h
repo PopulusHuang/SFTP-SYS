@@ -1,9 +1,7 @@
 #ifndef _MENU_H_
 #define _MENU_H_
 
-#define ORDER_SIZE 8 	/* the size of each order */
-#define ORDER_NUM  8	/* order number */
-
+#include "../share/order.h"
  int Moption();
  int Mlogin(char *order);
  int Mmain(char *order);

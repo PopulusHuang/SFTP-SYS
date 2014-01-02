@@ -68,32 +68,6 @@ int create_recvfile(SSL *ssl,char *new_fileName,char *buf)
 	printf("open file:%s succeed\n",new_fileName);
 	return fd;
 }
-/* write data to the empty file */
-int write_data(SSL *ssl,char *buf,int fd)
-{
-	int len;
-    while(1)
-    {
-      bzero(buf, MAXBUF + 1);
-      len = SSL_read(ssl, buf, MAXBUF); /* read data from client */
-      if(len == 0)
-      {
-        printf("Receive Complete !\n");
-        break;
-      }
-      else if(len < 0)
-      {
-        printf("Failure to receive message ! Error code is %d，Error messages are '%s'\n", errno, strerror(errno));
-		return -1;
-      }
-      if(write(fd,buf,len)<0)	/* write data to server */
-      {
-        perror("write:");
-		return -1;
-      }
-    }
-	return 0;
-}
 int socket_init(int lisnum,char **argv)
 {
   int sockfd;
@@ -128,43 +102,10 @@ void ssl_load_cert_priv(SSL_CTX *ctx)
   ssl_load_pk(ctx,certificate,privkey);
 
 }
-/* receive file from the client */
-#if 0
-int recv_file(SSL *ssl)
-{
-	int fd;
-  	char buf[MAXBUF + 1]; /*add one space to save '\0'*/
-    char new_fileName[50]="client_file/";
-#if 0
-	SSL *ssl;
-    ssl = SSL_new(ctx);
-    /* insert user's socket to SSL */
-    SSL_set_fd(ssl, connfd);
-    /* establish SSL connection */
-    if (SSL_accept(ssl) == -1)
-    {
-      perror("accept");
-      close(connfd);
-    }
-#endif
-	/* receive file name from the client,
-	 * and create a empty file with it */
-	fd = create_recvfile(ssl,new_fileName,buf);
-	/* receive the client's data and write to the empty file*/
-	int n = write_data(ssl,buf,fd);
-
-    close(fd); 	/* close file */
-//    SSL_shutdown(ssl);  /* close ssl connection */
- //   SSL_free(ssl);		/* free ssl */
-	return n ;
-
-}
-#endif
 int main(int argc, char **argv)
 {
   int sockfd, connfd, fd;
   int ret;
-  char order[ORDER_SIZE];
   socklen_t len;
   struct sockaddr_in my_addr, their_addr;
   unsigned int myport, lisnum; /*lisnum-Max listen number*/
@@ -209,7 +150,8 @@ int main(int argc, char **argv)
   int cur_event_num = 1;/* current event number */
   struct epoll_event ev;
   struct epoll_event events[MAX_EVENT];	 
-
+  char data[DATA_SIZE];
+  bzero(data,sizeof(data));
   epfd = epoll_create(MAX_EVENT);
   Event_add(epfd,sockfd,&ev);
   /* Accept client connection */
@@ -244,15 +186,19 @@ int main(int argc, char **argv)
 			 setnonblocking(new_connfd);
 			 Event_add(epfd,new_connfd,&ev);
 			 cur_event_num++;
-		  }else if(events[i].events&EPOLLIN)
+		  }else 
 		  {
 			  connfd = events[i].data.fd; 
 			 // int ret = recv_file(ssl);
-			 SSL_read(ssl,order,ORDER_SIZE);
-			 ret = parse_clnt(ssl,order,db);
-			  if(ret == COUT && errno != EAGAIN)
+			 int nread=SSL_read_pk(ssl,data,DATA_SIZE-1);
+			 if(errno == EAGAIN||strcmp(data,"")==0)
+					 continue;
+			 ret = parse_clnt(ssl,data,db);
+			 bzero(data,sizeof(data));
+			  if((ret==COUT) || (nread==0)&& errno != EAGAIN)
 			  {
 #if 1
+				printf("client logout");
 			 	epoll_ctl(epfd,EPOLL_CTL_DEL,connfd,&ev);
 				close(connfd);
 				SSL_shutdown(ssl);

@@ -15,7 +15,7 @@ int Moption(void)
 /* print login menu */
 int Mlogin(char *order)
 {
-loop:printf("\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
+loop:printf("\n\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
 	 printf("\033[31m|  1. login               |\033[0m\n");
 	 printf("\033[31m|  2. register            |\033[0m\n");
 	 printf("\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
@@ -36,7 +36,7 @@ loop:printf("\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
 /* print the main menu */
 int Mmain(char *order)
 {
-loop: printf("\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
+loop: printf("\n\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
 	  printf("\033[31m|  1. explore local files     |\033[0m\n");
 	  printf("\033[31m|  2. explore server files    |\033[0m\n");
 	  printf("\033[31m|  3. upload files            |\033[0m\n");

@@ -4,31 +4,34 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
-BUF_SIZE	parse.c	7;"	d	file:
+BUF_SIZE	clnt_parse.c	8;"	d	file:
 CC	Makefile	/^CC=gcc$/;"	m
 CFLAGS	Makefile	/^CFLAGS= -lssl -lcrypto -lsqlite3 -g$/;"	m
-CLIENT_PATH	parse.c	9;"	d	file:
-FILENAME_SIZE	parse.c	8;"	d	file:
-LOGIN_OK	parse.h	3;"	d
+CLIENT_PATH	clnt_parse.c	10;"	d	file:
+ECHOFLAGS	echo_mode.c	6;"	d	file:
+ECHO_OFF	echo_mode.c	8;"	d	file:
+ECHO_ON	echo_mode.c	7;"	d	file:
+FILENAME_SIZE	clnt_parse.c	9;"	d	file:
+LOGIN_OK	clnt_parse.h	3;"	d
 MAXBUF	client.c	15;"	d	file:
 Mlogin	menu.c	/^int Mlogin(char *order)$/;"	f
 Mmain	menu.c	/^int Mmain(char *order)$/;"	f
 Moption	menu.c	/^int Moption(void)$/;"	f
-ORDER_NUM	menu.h	5;"	d
-ORDER_SIZE	menu.h	4;"	d
-REGISTER_OK	parse.h	4;"	d
-SERVER_PATH	parse.c	10;"	d	file:
+REGISTER_OK	clnt_parse.h	4;"	d
+SERVER_PATH	clnt_parse.c	11;"	d	file:
 SERV_PORT	client.c	16;"	d	file:
 ShowCerts	client.c	/^void ShowCerts(SSL * ssl)$/;"	f
+_CLNT_PARSE_H_	clnt_parse.h	2;"	d
 _MENU_H_	menu.h	2;"	d
-_PARSE_H_	parse.h	2;"	d
-clnt_login	parse.c	/^int clnt_login(SSL *ssl,char *order)$/;"	f
-clnt_register	parse.c	/^int clnt_register(SSL *ssl,char *order)$/;"	f
-create_emptyfile	parse.c	/^int create_emptyfile(char *filename)$/;"	f
-create_recvdir	parse.c	/^void create_recvdir(char *fdir)$/;"	f
-download_files	parse.c	/^int download_files(SSL *ssl,char *order)$/;"	f
-get_path	parse.c	/^int get_path(char *scan_path,int flag)$/;"	f
-logout	parse.c	/^int logout()$/;"	f
+clnt_login	clnt_parse.c	/^int clnt_login(SSL *ssl,char *order)$/;"	f
+clnt_register	clnt_parse.c	/^int clnt_register(SSL *ssl,char *order)$/;"	f
+create_emptyfile	clnt_parse.c	/^int create_emptyfile(char *filename)$/;"	f
+create_recvdir	clnt_parse.c	/^void create_recvdir(char *fdir)$/;"	f
+download_files	clnt_parse.c	/^int download_files(SSL *ssl,char *order)$/;"	f
+echo_mode	echo_mode.c	/^int echo_mode(int fd,int option)  $/;"	f
+get_path	clnt_parse.c	/^int get_path(char *scan_path,int flag)$/;"	f
+input_filename	clnt_parse.c	/^int input_filename(char *filename)$/;"	f
+logout	clnt_parse.c	/^int logout(SSL *ssl,char *order)$/;"	f
 main	client.c	/^int main(int argc, char **argv)$/;"	f
 obj_account	Makefile	/^obj_account=..\/share\/account.o$/;"	m
 obj_all	Makefile	/^obj_all=$(obj_clnt) $(obj_sock) $(obj_ssl) $(obj_menu)  $(obj_order) $(obj_account) $(obj_parse)$/;"	m
@@ -38,21 +41,20 @@ obj_order	Makefile	/^obj_order=..\/share\/order.o$/;"	m
 obj_parse	Makefile	/^obj_parse=parse.o$/;"	m
 obj_sock	Makefile	/^obj_sock=..\/share\/sock_wrap.o$/;"	m
 obj_ssl	Makefile	/^obj_ssl=..\/share\/ssl_wrap.o$/;"	m
-open_file	parse.c	/^int open_file(char *fileName)$/;"	f
-package_order	parse.c	/^void package_order(char *order,char *data,char *order_pack)$/;"	f
-parse_clnt_order	parse.c	/^int parse_clnt_order(SSL *ssl,char *order)$/;"	f
-parse_serv_order	parse.c	/^int parse_serv_order(char *ack,char *order)$/;"	f
+open_file	clnt_parse.c	/^int open_file(char *fileName)$/;"	f
+parse_clnt_order	clnt_parse.c	/^int parse_clnt_order(SSL *ssl,char *order)$/;"	f
+parse_serv_order	clnt_parse.c	/^int parse_serv_order(char *ack,char *order)$/;"	f
 print_error	client.c	/^void print_error()$/;"	f
-recv_file_data	parse.c	/^int recv_file_data(SSL *ssl,int fd)$/;"	f
-recv_file_list	parse.c	/^int recv_file_list(SSL *ssl)$/;"	f
-remove_space	parse.c	/^void remove_space(char *src,char *dest)$/;"	f
-scan_local_files	parse.c	/^void scan_local_files(void)$/;"	f
-scan_serv_files	parse.c	/^int scan_serv_files(SSL *ssl,char *order)$/;"	f
-send_account	parse.c	/^int send_account(SSL *ssl,ACK *ack,ACCOUNT *account,char *order)$/;"	f
-send_data	parse.c	/^void send_data(SSL *ssl,int fd)$/;"	f
-send_file	parse.c	/^int send_file(SSL *ssl)$/;"	f
-send_filename	parse.c	/^int send_filename(SSL *ssl,char *fileName)$/;"	f
+recv_file_data	clnt_parse.c	/^int recv_file_data(SSL *ssl,int fd)$/;"	f
+recv_file_list	clnt_parse.c	/^int recv_file_list(SSL *ssl,char *order)$/;"	f
+remove_path	clnt_parse.c	/^int remove_path(char *filename,char *sendFN)$/;"	f
+remove_space	clnt_parse.c	/^void remove_space(char *src,char *dest)$/;"	f
+scan_local_files	clnt_parse.c	/^void scan_local_files(void)$/;"	f
+scan_serv_files	clnt_parse.c	/^int scan_serv_files(SSL *ssl,char *order)$/;"	f
+send_account	clnt_parse.c	/^int send_account(SSL *ssl,ACK *ack,ACCOUNT *account,char *order)$/;"	f
+send_data	clnt_parse.c	/^void send_data(SSL *ssl,int fd)$/;"	f
+send_file	clnt_parse.c	/^int send_file(SSL *ssl,char *order,int fd,char *filename)$/;"	f
 show_Mlogin	client.c	/^int show_Mlogin(SSL *ssl)$/;"	f
 show_Mmain	client.c	/^int show_Mmain(SSL *ssl)$/;"	f
 sock_init	client.c	/^int sock_init(void)$/;"	f
-upload_files	parse.c	/^int upload_files(SSL *ssl,char *order)$/;"	f
+upload_files	clnt_parse.c	/^int upload_files(SSL *ssl,char *order)$/;"	f
