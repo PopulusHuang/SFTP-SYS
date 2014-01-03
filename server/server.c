@@ -196,18 +196,18 @@ int main(int argc, char **argv)
 		  }
 		  else 
 		  {
-			int n,nread;
+			int n,nread,data_size;
 			 connfd = events[i].data.fd; 
 			 n = search_sockssl(sockssl,SOCKSSL_SIZE,connfd);
 
 			 bzero(data,sizeof(data));
 			 nread = SSL_read_pk(sockssl[n].ssl,data,DATA_SIZE-1);
+			 data_size = strlen(data);
 			 if(nread > 0)
 			 {
-			 	data[nread] = '\0';
 			 	ret = parse_clnt(sockssl[n].ssl,data,db);
 			 }
-			  if((nread <= 0)||(ret==COUT))
+			  if((nread <= 0)||(ret ==COUT))
 			  {
 #if 1
 				printf("client logout\n");
