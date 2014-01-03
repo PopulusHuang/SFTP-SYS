@@ -73,8 +73,8 @@ int socket_init(int lisnum,char **argv)
   int sockfd;
   struct sockaddr_in servaddr;
   sockfd = Socket(PF_INET, SOCK_STREAM, 0);
-//  setnonblocking(sockfd);
-
+  int opt = 1;
+  setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
   bzero(&servaddr, sizeof(servaddr));
   servaddr.sin_family = PF_INET;
   servaddr.sin_port = htons(SERV_PORT);
@@ -105,13 +105,13 @@ void ssl_load_cert_priv(SSL_CTX *ctx)
 int main(int argc, char **argv)
 {
   int sockfd, connfd, fd;
-  int ret;
+  int ret = 0;
   socklen_t len;
   struct sockaddr_in my_addr, their_addr;
   unsigned int myport, lisnum; /*lisnum-Max listen number*/
 
-  sqlite3 *db;
  /* open database */ 
+  sqlite3 *db;
 	ret = sqlite3_open("./ssf.db",&db);
 	if(ret != SQLITE_OK)
 	{
@@ -119,6 +119,7 @@ int main(int argc, char **argv)
 		fputs("\n",stderr);
 		exit(1);
 	}
+/* config openssl */
   SSL_CTX *ctx; /*SSL Content Text*/
 	
   arg_init(argv,&lisnum,&myport);
@@ -147,13 +148,17 @@ int main(int argc, char **argv)
   int i; 
   int epfd;	/* epoll file describes */
   int all_event_num ;/* event number*/
-  int cur_event_num = 1;/* current event number */
+  int cur_event_num = 10;/* current event number */
+  SOCKSSL sockssl[SOCKSSL_SIZE]; /* socket's ssl */
   struct epoll_event ev;
   struct epoll_event events[MAX_EVENT];	 
   char data[DATA_SIZE];
+
   bzero(data,sizeof(data));
   epfd = epoll_create(MAX_EVENT);
   Event_add(epfd,sockfd,&ev);
+  /* init sockssl array */
+  init_sockssl(sockssl,SOCKSSL_SIZE); 
   /* Accept client connection */
   len = sizeof(struct sockaddr);
   SSL *ssl;
@@ -174,6 +179,7 @@ int main(int argc, char **argv)
     		ssl = SSL_new(ctx);
 		    /* insert user's socket to SSL */
 		    SSL_set_fd(ssl, new_connfd);
+			add_sockssl(sockssl,SOCKSSL_SIZE,ssl,new_connfd);
 		    /* establish SSL connection */
 		    if (SSL_accept(ssl) == -1)
 		    {
@@ -181,6 +187,7 @@ int main(int argc, char **argv)
     		  SSL_shutdown(ssl);  /* close ssl connection */
    			  SSL_free(ssl);		/* free ssl */
 		      close(new_connfd);
+			  remove_sockssl(sockssl,SOCKSSL_SIZE,new_connfd);
 			  continue;
 		    }
 			 setnonblocking(new_connfd);
@@ -189,21 +196,28 @@ int main(int argc, char **argv)
 		  }
 		  else 
 		  {
-			  connfd = events[i].data.fd; 
-			 // int ret = recv_file(ssl);
-			 int nread=SSL_read_pk(ssl,data,DATA_SIZE-1);
-			 if(errno == EAGAIN||strcmp(data,"")==0)
-					 continue;
-			 ret = parse_clnt(ssl,data,db);
+			int n,nread;
+			 connfd = events[i].data.fd; 
+			 n = search_sockssl(sockssl,SOCKSSL_SIZE,connfd);
+
 			 bzero(data,sizeof(data));
-			  if(((ret==COUT) && (errno != EAGAIN))||(nread <= 0))
+			 nread = SSL_read_pk(sockssl[n].ssl,data,DATA_SIZE-1);
+			 if(nread > 0)
+			 {
+			 	data[nread] = '\0';
+			 	ret = parse_clnt(sockssl[n].ssl,data,db);
+			 }
+			  if((nread <= 0)||(ret==COUT))
 			  {
 #if 1
 				printf("client logout\n");
-			 	epoll_ctl(epfd,EPOLL_CTL_DEL,connfd,&ev);
 				close(connfd);
-				SSL_shutdown(ssl);
-				SSL_free(ssl);
+				SSL_shutdown(sockssl[n].ssl);
+				SSL_free(sockssl[n].ssl);
+				/* remove the sockssl */
+				sockssl[n].ssl = NULL;
+				sockssl[n].sockfd = INVAILD;
+			 	epoll_ctl(epfd,EPOLL_CTL_DEL,connfd,&events[i]);
 				cur_event_num--;
 #endif
 			  }

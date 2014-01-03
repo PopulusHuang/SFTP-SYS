@@ -92,7 +92,8 @@ int show_Mlogin(SSL *ssl)
 			}
 			else{
 				printf("login failure!\n");	
-				exit(1);
+				break;
+
 			}
 		 }
 		 else 

@@ -23,7 +23,7 @@ int setnonblocking(int sockfd)
 }
 int Event_add(int epfd,int listenfd,struct epoll_event *ev)
 {
-    ev->events = EPOLLIN | EPOLLET |EPOLLHUP;
+    ev->events = EPOLLIN|EPOLLET |EPOLLHUP;
     ev->data.fd = listenfd;
     if (epoll_ctl(epfd, EPOLL_CTL_ADD, listenfd, ev) < 0)
     {

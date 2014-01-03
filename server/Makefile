@@ -7,7 +7,7 @@ obj_epoll=myepoll.o
 obj_parse=srv_parse.o
 obj_all=$(obj_srv) $(obj_ssl) $(obj_sock) $(obj_epoll) $(obj_parse) $(obj_order) $(obj_account)
 CC=gcc
-CFLAGS= -lssl -lcrypto -lsqlite3 -g #-fno-stack-protector
+CFLAGS= -lssl -lcrypto -lsqlite3 -g -rdynamic#-fno-stack-protector
 ssl_server:$(obj_all)
 	$(CC) -o $@ $(obj_all) $(CFLAGS)
 clean:
