@@ -1,0 +1,87 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ACCOUNT	account.h	/^}ACCOUNT;$/;"	t	typeref:struct:Account
+ACK	order.h	/^}ACK;$/;"	t	typeref:struct:ack_order
+Accept	sock_wrap.c	/^int Accept(int fd, struct sockaddr *sa, socklen_t *salenptr)$/;"	f
+Account	account.h	/^typedef struct Account{$/;"	s
+BUF_SIZE	account.c	5;"	d	file:
+Bind	sock_wrap.c	/^void Bind(int fd, const struct sockaddr *sa, socklen_t salen)$/;"	f
+CDOWN	order.h	15;"	d
+CIN	order.h	10;"	d
+CNULL	order.h	9;"	d
+COUT	order.h	16;"	d
+CREG	order.h	11;"	d
+CSCL	order.h	12;"	d
+CSCS	order.h	13;"	d
+CUP	order.h	14;"	d
+CUT_NAME	order.h	5;"	d
+CUT_ORDER	order.h	7;"	d
+CUT_PASSWD	order.h	6;"	d
+CUT_PATH	order.h	4;"	d
+Close	sock_wrap.c	/^void Close(int fd)$/;"	f
+Connect	sock_wrap.c	/^int Connect(int fd, const struct sockaddr *sa, socklen_t salen)$/;"	f
+DATA_SIZE	order.h	8;"	d
+Getsockname	sock_wrap.c	/^int Getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen)$/;"	f
+INVAILD	ssl_wrap.h	15;"	d
+LOGIN_OK	account.h	4;"	d
+Listen	sock_wrap.c	/^void Listen(int fd, int backlog)$/;"	f
+NAME_SIZE	account.h	8;"	d
+ORDER_NUM	order.h	18;"	d
+ORDER_SIZE	order.h	17;"	d
+PASSWD_ERROR	account.h	7;"	d
+PASSWD_SIZE	account.h	9;"	d
+REGISTER_OK	account.h	5;"	d
+Read	sock_wrap.c	/^ssize_t Read(int fd, void *ptr, size_t nbytes)$/;"	f
+Readline	sock_wrap.c	/^ssize_t Readline(int fd, void *vptr, size_t maxlen)$/;"	f
+Readn	sock_wrap.c	/^ssize_t Readn(int fd, void *vptr, size_t n)$/;"	f
+Recvfrom	sock_wrap.c	/^int Recvfrom(int sockfd, void *buf, size_t len, int flags,$/;"	f
+SOCKSSL	ssl_wrap.h	/^}SOCKSSL;$/;"	t	typeref:struct:sockssl
+SOCKSSL_SIZE	ssl_wrap.h	16;"	d
+SSL_read_pk	ssl_wrap.c	/^int SSL_read_pk(SSL *ssl, void *buf, int num)$/;"	f
+SSL_write_pk	ssl_wrap.c	/^int SSL_write_pk(SSL *ssl, const void *buf, int num)$/;"	f
+Select	sock_wrap.c	/^int Select(int nfds, $/;"	f
+Sendto	sock_wrap.c	/^int Sendto(int sockfd, const void *buf, size_t len, int flags,$/;"	f
+Socket	sock_wrap.c	/^int Socket(int family, int type, int protocol)$/;"	f
+Socketpair	sock_wrap.c	/^int Socketpair(int domain,int type,int protocol,int sv[2])$/;"	f
+USER_ERROR	account.h	6;"	d
+USER_OK	account.h	3;"	d
+Write	sock_wrap.c	/^ssize_t Write(int fd, const void *ptr, size_t nbytes)$/;"	f
+Writen	sock_wrap.c	/^ssize_t Writen(int fd, const void *vptr, size_t n)$/;"	f
+_ACCOUNT_H_	account.h	2;"	d
+_ORDER_H_	order.h	2;"	d
+_SSL_WRAP_H	ssl_wrap.h	2;"	d
+_WRAP_H_	sock_wrap.h	2;"	d
+ack_order	order.h	/^typedef struct ack_order{$/;"	s
+add_sockssl	ssl_wrap.c	/^int add_sockssl(SOCK_SSL *sockssl,int size,SSL *ssl,int sockfd)$/;"	f
+cut_string	order.c	/^int cut_string(char *src,char *dest,int min,int max)$/;"	f
+data	order.h	/^	char data[DATA_SIZE];		\/* ack data *\/	$/;"	m	struct:ack_order
+fetch_data	order.c	/^int fetch_data(char *data,char *cutstr,int cutflg)$/;"	f
+fetch_name	account.c	/^int fetch_name(char *data,char *name)$/;"	f
+fetch_order	order.c	/^int fetch_order(char *data,char *order)$/;"	f
+fetch_passwd	account.c	/^int fetch_passwd(char *data,char *passwd)$/;"	f
+find_char	order.c	/^int find_char(char *data,char c)$/;"	f
+get_sockssl	ssl_wrap.c	/^SSL *get_sockssl(SOCK_SSL *sockssl,int size,int sockfd)$/;"	f
+init_sockssl	ssl_wrap.c	/^int init_sockssl(SOCK_SSL *sockssl,int size)$/;"	f
+input_account	account.c	/^int input_account(char *account,char *prompt_info,int size)  $/;"	f
+is_order_exist	order.c	/^int is_order_exist(char *order)$/;"	f
+my_read	sock_wrap.c	/^static ssize_t my_read(int fd, char *ptr)$/;"	f	file:
+name	account.h	/^	char name[NAME_SIZE+1];$/;"	m	struct:Account
+order	order.h	/^	char order[ORDER_SIZE];		\/* ack order *\/$/;"	m	struct:ack_order
+order_set	order.c	/^char order_set[ORDER_NUM][ORDER_SIZE]={"c00a&","c01b&","c02c&","c03d&","c04e&","c05f&","c06g&","c07h&"};$/;"	v
+passwd	account.h	/^	char passwd[PASSWD_SIZE+1];$/;"	m	struct:Account
+perr_exit	sock_wrap.c	/^void perr_exit(const char *s)$/;"	f
+recv_order	order.c	/^int recv_order(SSL *ssl,char *order)$/;"	f
+register_account	account.c	/^int register_account(sqlite3 *db,char *username,char *passwd)$/;"	f
+remove_sockssl	ssl_wrap.c	/^int remove_sockssl(SOCK_SSL *sockssl,int size,int sockfd)$/;"	f
+search_sockssl	ssl_wrap.c	/^int search_sockssl(SOCK_SSL *sockssl,int size,int sockfd)$/;"	f
+send_order	order.c	/^int send_order(SSL *ssl,char *order)$/;"	f
+sockfd	ssl_wrap.h	/^	int sockfd;	\/* connected socket's file describe *\/$/;"	m	struct:sockssl
+sockssl	ssl_wrap.h	/^typedef struct sockssl$/;"	s
+ssl	ssl_wrap.h	/^	SSL *ssl;$/;"	m	struct:sockssl
+ssl_close_pk	ssl_wrap.c	/^int ssl_close_pk(SSL_CTX *ctx, SSL *ssl, int sockfd, int new_fd)$/;"	f
+ssl_load_pk	ssl_wrap.c	/^int ssl_load_pk(SSL_CTX *ctx, char *certificate, char *privateKey)$/;"	f
+verify_account	account.c	/^int verify_account(sqlite3 *db,char *username,char *passwd)$/;"	f

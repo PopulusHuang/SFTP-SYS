@@ -203,7 +203,8 @@ int main(int argc, char **argv)
 			 bzero(data,sizeof(data));
 			 nread = SSL_read_pk(sockssl[n].ssl,data,DATA_SIZE-1);
 			 data_size = strlen(data);
-			 if(nread > 0)
+			/*avoid stack overflow when pass the 'data' to 'parse_clnt'*/
+			 if(nread > 0 && (data_size < (DATA_SIZE-ORDER_SIZE)))
 			 {
 			 	ret = parse_clnt(sockssl[n].ssl,data,db);
 			 }
