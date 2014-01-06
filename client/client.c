@@ -9,7 +9,7 @@
 #include <openssl/err.h>
 #include "../share/ssl_wrap.h"
 #include "../share/sock_wrap.h"
-#include "../share/order.h"
+#include "../share/sftpack.h"
 #include "menu.h"
 #include "clnt_parse.h"
 #define MAXBUF 1024
@@ -73,27 +73,21 @@ int sock_init(void)
 }
 int show_Mlogin(SSL *ssl)
 {
-  char order[ORDER_SIZE];
-  int n;
+  int order;
   while(1)
   {
-  	   	 Mlogin(order);  
-		 n = parse_clnt_order(ssl,order);	 
-	     if(n == LOGIN_OK)
+  	   	 order = Mlogin();  
+		 order = parse_clnt_order(ssl,order);	 
+	     if(order == LOGIN_OK)
 		 {
 			return 1;
 		 }
-		 else if(n == REGISTER_OK)  /* register new account */
+		 else if(order == REGISTER_OK)  /* register new account */
 		 {
 			printf("Now to login with new account!\n"); 
-			if(clnt_login(ssl,order_set[CIN]) == LOGIN_OK)
+			if(clnt_login(ssl,CIN) == LOGIN_OK)
 			{
 					return 1;
-			}
-			else{
-				printf("login failure!\n");	
-				break;
-
 			}
 		 }
 		 else 
@@ -107,13 +101,12 @@ int show_Mlogin(SSL *ssl)
 }
 int show_Mmain(SSL *ssl)
 {
-	char order[ORDER_SIZE];
-	int n;
+	int order;
 	while(1)
 	{
-		Mmain(order);	
-		n = parse_clnt_order(ssl,order);
-		if(n == COUT)	/* client logout */
+		order = Mmain();	
+		order = parse_clnt_order(ssl,order);
+		if(order == COUT)	/* client logout */
 			break;
 	}
 }

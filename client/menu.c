@@ -1,8 +1,7 @@
 #include "menu.h"
-#include "../share/order.h"
 #include <stdio.h>
 #include <string.h>
-
+#include "../share/sftpack.h"
 /* get the option number */
 int Moption(void)
 {
@@ -13,17 +12,19 @@ int Moption(void)
 	return n;
 }
 /* print login menu */
-int Mlogin(char *order)
+int Mlogin(void)
 {
+	int order = CNULL;
 loop:printf("\n\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
 	 printf("\033[31m|  1. login               |\033[0m\n");
 	 printf("\033[31m|  2. register            |\033[0m\n");
 	 printf("\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
 	int n = Moption();	
 #if 1
-	if (n < 3 && n > 0)
+	if ( n < 3 && n > 0)
 	{
-		strcpy(order,*(order_set+n));
+		/* get the order code */
+		order = order_set[n];
 	}
 	else
 	{
@@ -31,11 +32,12 @@ loop:printf("\n\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
 		goto loop;
 	}
 #endif
-	return 0;
+	return order;
 }
 /* print the main menu */
-int Mmain(char *order)
+int Mmain(void)
 {
+	  int order = CNULL;
 loop: printf("\n\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
 	  printf("\033[31m|  1. explore local files     |\033[0m\n");
 	  printf("\033[31m|  2. explore server files    |\033[0m\n");
@@ -47,7 +49,7 @@ loop: printf("\n\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
 #if 1
 	if (n < 8 && n > 2)
 	{
-		strcpy(order,*(order_set+n));
+		order = order_set[n];
 	}
 	else
 	{
@@ -55,7 +57,7 @@ loop: printf("\n\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
 		goto loop;
 	}
 #endif
-	return 0;
+	return order;
 }
 #if 0
 int main(int argc, const char *argv[])

@@ -1,12 +1,10 @@
-obj_clnt=client.o 
+obj_clnt=client.o clnt_parse.o menu.o echo_mode.o
 obj_sock=../share/sock_wrap.o
 obj_ssl=../share/ssl_wrap.o
-obj_order=../share/order.o
+obj_sftpack=../share/sftpack.o
 obj_account=../share/account.o
-obj_menu=menu.o
-obj_parse=clnt_parse.o
-obj_echo=echo_mode.o
-obj_all=$(obj_clnt) $(obj_sock) $(obj_ssl) $(obj_menu)  $(obj_order) $(obj_account) $(obj_parse) $(obj_echo)
+obj_file=../share/sftfile.o
+obj_all=$(obj_clnt) $(obj_sock) $(obj_ssl) $(obj_sftpack) $(obj_account) $(obj_file) 
 CC=gcc
 CFLAGS= -lssl -lcrypto -lsqlite3 -g
 ssl_client:$(obj_all)

@@ -2,69 +2,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include "account.h"
+#include "sftpack.h"
 #define BUF_SIZE 1024
 
-/* fetch name from data */
-int fetch_name(char *data,char *name)
-{
-	int data_size;	
-	int i,j;
-	data_size = strlen(data);
-	for(i = 0,j = 0;i < data_size;i++)
-	{
-		if(data[i] == '&')	/* name start by '&' */
-		{
-			j = 0;
-			continue;
-		}
-		else if(data[i] == '@')	/* name end by '@' */
-		{
-			return 1;	
-		}
-		else if(i < NAME_SIZE)
-		{
-			name[j++] = data[i];	
-		}
-	}
-	return 0;
-}
-/* fetch password from data */
-int fetch_passwd(char *data,char *passwd)
-{
-	int data_size;
-	int i,j;
-	int cp_flg = 0;	/*copy flag*/
-	data_size = strlen(data);
-	for(i = 0,j = 0;i < data_size;i++)
-	{
-		if(data[i] == '@')	/* passwd start by '@' */	
-		{
-			cp_flg = 1;	
-			continue;
-		}
-		if(cp_flg == 1 && j < PASSWD_SIZE)
-		{
-			passwd[j++] = data[i];	
-		}
-	}
-	return 0;
-}
 /* descried: get account name from input 
  * argument: 
  * 	 account     -- user name or passwd;
  * 	 prompt_info -- prompt information;
  * 	 size        -- size of account;
  * */
-int input_account(char *account,char *prompt_info,int size)  
+int account_input(char *account,char *prompt_info,int size)  
 {  
-   printf(prompt_info);	/* print prompt information */
+   printf("%s",prompt_info);	/* print prompt information */
    fgets(account,size,stdin);
    int n = strlen(account);
    account[n-1] = '\0';
    return n;  
 }  
 /* verify user's name and passwd */
-int verify_account(sqlite3 *db,char *username,char *passwd)
+int account_verify(sqlite3 *db,char *username,char *passwd)
 {
 	char sql[BUF_SIZE];	/* SQL sentene */	
 	int ret;
@@ -96,19 +52,20 @@ int verify_account(sqlite3 *db,char *username,char *passwd)
 			}
 		}
 				printf("the passwd is wrong!\n");
-				return PASSWD_ERROR;
+				return PASSWD_ERR;
 	}
 	sqlite3_free_table(aResult);
 	return USER_OK;
 }
 /* register a new account */
-int register_account(sqlite3 *db,char *username,char *passwd)
+int account_register(sqlite3 *db,char *username,char *passwd)
 {
 	char sql[BUF_SIZE];
 	char *zErrMsg = NULL;
 	int ret;
+	int n;
 	/* check the username is already exist first */
-	if(verify_account(db,username,NULL) != USER_OK)	
+	if(account_verify(db,username,NULL) != USER_OK)	
 	{
 		/* add new account*/
 		sprintf(sql,"insert into user values('%s','%s');",
@@ -122,13 +79,25 @@ int register_account(sqlite3 *db,char *username,char *passwd)
 		else
 		{
 			printf("Account add successfully!\n");	
-			return 0;
+			n = REGISTER_OK;
 		}
 
 	}
 	else	
 	{
 		printf("Account is already exits!\n");	
+		n = USER_EXIST;  
 	}
-		return -1;
+		return ;
+}
+/* send account to server */
+int account_send(SSL *ssl,ACCOUNT user,int order)
+{
+	SFT_PACK sftpack;		
+	SFT_DATA data;
+	/* pack data */
+	sftpack_wrap(&sftpack,order,INVAILD,"");
+	sftpack.data.user = user;
+	int n = sftpack_send(ssl,&sftpack);
+	return n;
 }

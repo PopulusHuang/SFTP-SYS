@@ -112,7 +112,7 @@ int main(int argc, char **argv)
 
  /* open database */ 
   sqlite3 *db;
-	ret = sqlite3_open("./ssf.db",&db);
+	ret = sqlite3_open("../database/sft_user.db",&db);
 	if(ret != SQLITE_OK)
 	{
 		fputs(sqlite3_errmsg(db),stderr);
@@ -162,6 +162,8 @@ int main(int argc, char **argv)
   /* Accept client connection */
   len = sizeof(struct sockaddr);
   SSL *ssl;
+  SFT_PACK clnt_pack;
+  sftpack_init(&clnt_pack);
   while (1)
   {
 	  /* wait for events */
@@ -196,18 +198,17 @@ int main(int argc, char **argv)
 		  }
 		  else 
 		  {
-			int n,nread,data_size;
+			int n,nread;
 			 connfd = events[i].data.fd; 
 			 n = search_sockssl(sockssl,SOCKSSL_SIZE,connfd);
 
-			 bzero(data,sizeof(data));
-			 nread = SSL_read_pk(sockssl[n].ssl,data,DATA_SIZE-1);
-			 data_size = strlen(data);
-			/*avoid stack overflow when pass the 'data' to 'parse_clnt'*/
-			 if(nread > 0 && (data_size < (DATA_SIZE-ORDER_SIZE)))
+			 //nread = SSL_read_pk(sockssl[n].ssl,data,DATA_SIZE-1);
+			 nread = sftpack_recv(sockssl[n].ssl,&clnt_pack);
+			 if(nread > 0)
 			 {
-			 	ret = parse_clnt(sockssl[n].ssl,data,db);
+			 	ret = parse_clnt_pack(sockssl[n].ssl,&clnt_pack,db);
 			 }
+			 sftpack_init(&clnt_pack);
 			  if((nread <= 0)||(ret ==COUT))
 			  {
 #if 1
