@@ -59,11 +59,3 @@ loop: printf("\n\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
 #endif
 	return order;
 }
-#if 0
-int main(int argc, const char *argv[])
-{
-	char buf[8]; 
-	Mmain(buf);	
-	return 0;
-}
-#endif

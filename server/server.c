@@ -209,6 +209,7 @@ int main(int argc, char **argv)
 			 	ret = parse_clnt_pack(sockssl[n].ssl,&clnt_pack,db);
 			 }
 			 sftpack_init(&clnt_pack);
+
 			  if((nread <= 0)||(ret ==COUT))
 			  {
 #if 1
