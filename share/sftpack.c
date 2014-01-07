@@ -26,7 +26,7 @@ int sftpack_wrap(SFT_PACK *sftpack,int order,int ack,char *buf)
 	sftpack_init(sftpack);
 	sftpack->order = order;
 	sftpack->ack = ack;
-	strcpy(sftpack->buf,buf);
+	strncpy(sftpack->buf,buf,DATA_SIZE);
 	return 0;
 }
 /* send package */

@@ -1,0 +1,189 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ACCEPT	share/sftpack.h	28;"	d
+ACCOUNT	share/account.h	/^}ACCOUNT;$/;"	t	typeref:struct:account
+ASK	share/sftpack.h	31;"	d
+Accept	share/sock_wrap.c	/^int Accept(int fd, struct sockaddr *sa, socklen_t *salenptr)$/;"	f
+BUF_SIZE	client/clnt_parse.c	8;"	d	file:
+BUF_SIZE	server/srv_parse.c	5;"	d	file:
+BUF_SIZE	share/account.c	6;"	d	file:
+Bind	share/sock_wrap.c	/^void Bind(int fd, const struct sockaddr *sa, socklen_t salen)$/;"	f
+CC	client/Makefile	/^CC=gcc$/;"	m
+CC	server/Makefile	/^CC=gcc$/;"	m
+CDOWN	share/sftpack.h	15;"	d
+CFLAGS	client/Makefile	/^CFLAGS= -lssl -lcrypto -lsqlite3 -g$/;"	m
+CFLAGS	server/Makefile	/^CFLAGS= -lssl -lcrypto -lsqlite3 -g -rdynamic#-fno-stack-protector$/;"	m
+CIN	share/sftpack.h	10;"	d
+CLIENT_PATH	client/clnt_parse.c	9;"	d	file:
+CNULL	share/sftpack.h	9;"	d
+COUT	share/sftpack.h	16;"	d
+CREG	share/sftpack.h	11;"	d
+CSCL	share/sftpack.h	12;"	d
+CSCS	share/sftpack.h	13;"	d
+CUP	share/sftpack.h	14;"	d
+CUT_NAME	share/sftpack.h	5;"	d
+CUT_ORDER	share/sftpack.h	7;"	d
+CUT_PASSWD	share/sftpack.h	6;"	d
+CUT_PATH	share/sftpack.h	4;"	d
+Close	share/sock_wrap.c	/^void Close(int fd)$/;"	f
+Connect	share/sock_wrap.c	/^int Connect(int fd, const struct sockaddr *sa, socklen_t salen)$/;"	f
+DATA_SIZE	share/sftpack.h	34;"	d
+DOWN_OK	share/sftpack.h	26;"	d
+ECHOFLAGS	client/echo_mode.h	6;"	d
+ECHO_OFF	client/echo_mode.h	8;"	d
+ECHO_ON	client/echo_mode.h	7;"	d
+Epoll_wait	server/myepoll.c	/^int Epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)$/;"	f
+Event_add	server/myepoll.c	/^int Event_add(int epfd,int listenfd,struct epoll_event *ev)$/;"	f
+FAIL	share/sftpack.h	30;"	d
+FILENAME_SIZE	share/sftfile.h	4;"	d
+FILE_ATTR	share/sftfile.h	/^}FILE_ATTR;$/;"	t	typeref:struct:file_attr
+FINISH	share/sftpack.h	29;"	d
+Getcwd	share/ssl_wrap.c	/^void Getcwd(char *pwd,int size)$/;"	f
+Getsockname	share/sock_wrap.c	/^int Getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen)$/;"	f
+INVAILD	share/sftpack.c	3;"	d	file:
+INVAILD	share/ssl_wrap.h	5;"	d
+LOGIN_FAIL	share/sftpack.h	20;"	d
+LOGIN_OK	share/sftpack.h	19;"	d
+Listen	share/sock_wrap.c	/^void Listen(int fd, int backlog)$/;"	f
+MAXBUF	client/client.c	15;"	d	file:
+MAXBUF	server/server.c	12;"	d	file:
+MAX_EVENT	server/server.c	14;"	d	file:
+Mlogin	client/menu.c	/^int Mlogin(void)$/;"	f
+Mmain	client/menu.c	/^int Mmain(void)$/;"	f
+Moption	client/menu.c	/^int Moption(void)$/;"	f
+NAME_SIZE	share/account.h	5;"	d
+NOT_FOUND	share/sftpack.h	18;"	d
+ORDER_NUM	share/sftpack.h	33;"	d
+PASSWD_ERR	share/sftpack.h	22;"	d
+PASSWD_OK	share/sftpack.h	21;"	d
+PASSWD_SIZE	share/account.h	6;"	d
+REGISTER_OK	share/sftpack.h	23;"	d
+Read	share/sock_wrap.c	/^ssize_t Read(int fd, void *ptr, size_t nbytes)$/;"	f
+Readline	share/sock_wrap.c	/^ssize_t Readline(int fd, void *vptr, size_t maxlen)$/;"	f
+Readn	share/sock_wrap.c	/^ssize_t Readn(int fd, void *vptr, size_t n)$/;"	f
+Recvfrom	share/sock_wrap.c	/^int Recvfrom(int sockfd, void *buf, size_t len, int flags,$/;"	f
+SERVER_PATH	client/clnt_parse.c	10;"	d	file:
+SERV_PORT	client/client.c	16;"	d	file:
+SERV_PORT	server/server.c	13;"	d	file:
+SFT_DATA	share/sftpack.h	/^}SFT_DATA;$/;"	t	typeref:union:sftdata
+SFT_PACK	share/sftpack.h	/^}SFT_PACK;$/;"	t	typeref:struct:sft_pack
+SOCKSSL	server/sockssl.h	/^}SOCKSSL;$/;"	t	typeref:struct:sockssl
+SOCKSSL_SIZE	share/ssl_wrap.h	6;"	d
+SRV_PARSE_H_	server/srv_parse.h	2;"	d
+SSL_read_pk	share/ssl_wrap.c	/^int SSL_read_pk(SSL *ssl, void *buf, int num)$/;"	f
+SSL_write_pk	share/ssl_wrap.c	/^int SSL_write_pk(SSL *ssl, const void *buf, int num)$/;"	f
+Select	share/sock_wrap.c	/^int Select(int nfds, $/;"	f
+Sendto	share/sock_wrap.c	/^int Sendto(int sockfd, const void *buf, size_t len, int flags,$/;"	f
+ShowCerts	client/client.c	/^void ShowCerts(SSL * ssl)$/;"	f
+Socket	share/sock_wrap.c	/^int Socket(int family, int type, int protocol)$/;"	f
+Socketpair	share/sock_wrap.c	/^int Socketpair(int domain,int type,int protocol,int sv[2])$/;"	f
+UP_OK	share/sftpack.h	25;"	d
+USER_ERROR	share/account.h	4;"	d
+USER_EXIST	share/sftpack.h	24;"	d
+USER_OK	share/account.h	3;"	d
+Write	share/sock_wrap.c	/^ssize_t Write(int fd, const void *ptr, size_t nbytes)$/;"	f
+Writen	share/sock_wrap.c	/^ssize_t Writen(int fd, const void *vptr, size_t n)$/;"	f
+_ACCOUNT_H_	share/account.h	2;"	d
+_CLNT_PARSE_H_	client/clnt_parse.h	2;"	d
+_ECHO_MODE_	client/echo_mode.h	2;"	d
+_HANDLE_H_	server/srv_handle.h	2;"	d
+_MENU_H_	client/menu.h	2;"	d
+_MYEPOLL_H_	server/myepoll.h	2;"	d
+_SFTFILE_H_	share/sftfile.h	2;"	d
+_SFTPACK_H_	share/sftpack.h	2;"	d
+_SOCKSSL_H_	server/sockssl.h	15;"	d
+_SSL_WRAP_H	share/ssl_wrap.h	2;"	d
+_WRAP_H_	share/sock_wrap.h	2;"	d
+account	share/account.h	/^typedef struct account{$/;"	s
+account_input	share/account.c	/^int account_input(char *account,char *prompt_info,int size)  $/;"	f
+account_register	share/account.c	/^int account_register(sqlite3 *db,char *username,char *passwd)$/;"	f
+account_send	share/account.c	/^int account_send(SSL *ssl,ACCOUNT user,int order)$/;"	f
+account_verify	share/account.c	/^int account_verify(sqlite3 *db,char *username,char *passwd)$/;"	f
+ack	share/sftpack.h	/^		unsigned int ack;					\/* server respond *\/$/;"	m	struct:sft_pack
+arg_init	server/server.c	/^void arg_init(char **argv,int *lisnum,int *myport)$/;"	f
+buf	share/sftpack.h	/^		char buf[DATA_SIZE];$/;"	m	struct:sft_pack
+clnt_close	server/server.c	/^int clnt_close(SSL *ssl,SOCKSSL *sockssl,int connfd)$/;"	f
+clnt_login	client/clnt_parse.c	/^int clnt_login(SSL *ssl,int order)$/;"	f
+clnt_register	client/clnt_parse.c	/^int clnt_register(SSL *ssl,int order)$/;"	f
+cut_path	client/clnt_parse.c	/^int cut_path(char *filename)$/;"	f
+data	share/sftpack.h	/^		SFT_DATA data;$/;"	m	struct:sft_pack
+download_files	client/clnt_parse.c	/^int download_files(SSL *ssl,int order)$/;"	f
+echo_mode	client/echo_mode.c	/^int echo_mode(int fd,int option)  $/;"	f
+file_attr	share/sftfile.h	/^typedef struct file_attr{$/;"	s
+file_attr	share/sftpack.h	/^	FILE_ATTR file_attr;$/;"	m	union:sftdata
+get_path	client/clnt_parse.c	/^int get_path(char *scan_path,int flag)$/;"	f
+handle_login	server/srv_handle.c	/^int handle_login(SSL *ssl,SFT_PACK *clnt_pack,sqlite3 *db)$/;"	f
+handle_logout	server/srv_handle.c	/^void handle_logout(SSL *ssl,SFT_PACK *clnt_pack)$/;"	f
+handle_recv_file	server/srv_handle.c	/^int handle_recv_file(SSL *ssl,SFT_PACK *clnt_pack)$/;"	f
+handle_register	server/srv_handle.c	/^int handle_register(SSL *ssl,SFT_PACK *clnt_pack,sqlite3 *db)$/;"	f
+handle_scan_dir	server/srv_handle.c	/^int handle_scan_dir(SSL *ssl,SFT_PACK *clnt_pack)$/;"	f
+handle_send_file	server/srv_handle.c	/^int handle_send_file(SSL *ssl,SFT_PACK *clnt_pack)$/;"	f
+login_name	client/clnt_parse.c	/^char login_name[NAME_SIZE] = "\\0";$/;"	v
+logout	client/clnt_parse.c	/^int logout(SSL *ssl,int order)$/;"	f
+main	client/client.c	/^int main(int argc, char **argv)$/;"	f
+main	server/server.c	/^int main(int argc, char **argv)$/;"	f
+my_read	share/sock_wrap.c	/^static ssize_t my_read(int fd, char *ptr)$/;"	f	file:
+name	share/account.h	/^	char name[NAME_SIZE];$/;"	m	struct:account
+name	share/sftfile.h	/^	char name[FILENAME_SIZE];$/;"	m	struct:file_attr
+obj_account	client/Makefile	/^obj_account=..\/share\/account.o$/;"	m
+obj_account	server/Makefile	/^obj_account=..\/share\/account.o$/;"	m
+obj_all	client/Makefile	/^obj_all=$(obj_clnt) $(obj_sock) $(obj_ssl) $(obj_sftpack) $(obj_account) $(obj_file) $/;"	m
+obj_all	server/Makefile	/^obj_all=$(obj_srv) $(obj_ssl) $(obj_sock) $(obj_parse) $(obj_file) $(obj_account) $(obj_pack)$/;"	m
+obj_clnt	client/Makefile	/^obj_clnt=client.o clnt_parse.o menu.o echo_mode.o$/;"	m
+obj_file	client/Makefile	/^obj_file=..\/share\/sftfile.o$/;"	m
+obj_file	server/Makefile	/^obj_file=..\/share\/sftfile.o$/;"	m
+obj_pack	server/Makefile	/^obj_pack=..\/share\/sftpack.o$/;"	m
+obj_parse	server/Makefile	/^obj_parse=srv_parse.o$/;"	m
+obj_sftpack	client/Makefile	/^obj_sftpack=..\/share\/sftpack.o$/;"	m
+obj_sock	client/Makefile	/^obj_sock=..\/share\/sock_wrap.o$/;"	m
+obj_sock	server/Makefile	/^obj_sock=..\/share\/sock_wrap.o$/;"	m
+obj_srv	server/Makefile	/^obj_srv=server.o srv_handle.o myepoll.o sockssl.o$/;"	m
+obj_ssl	client/Makefile	/^obj_ssl=..\/share\/ssl_wrap.o$/;"	m
+obj_ssl	server/Makefile	/^obj_ssl=..\/share\/ssl_wrap.o$/;"	m
+order	share/sftpack.h	/^		unsigned int order;					\/* client order *\/	$/;"	m	struct:sft_pack
+order_isexist	share/sftpack.c	/^int order_isexist(int order)$/;"	f
+order_set	share/sftpack.c	/^int order_set[ORDER_NUM] = {40,41,42,43,44,45,46,47};$/;"	v
+parse_clnt_order	client/clnt_parse.c	/^int parse_clnt_order(SSL *ssl,int order)$/;"	f
+parse_clnt_pack	server/srv_parse.c	/^int parse_clnt_pack(SSL *ssl,SFT_PACK *clnt_pack,sqlite3 *db)$/;"	f
+passwd	share/account.h	/^	char passwd[PASSWD_SIZE];$/;"	m	struct:account
+perr_exit	share/sock_wrap.c	/^void perr_exit(const char *s)$/;"	f
+print_error	client/client.c	/^void print_error()$/;"	f
+recv_file_list	client/clnt_parse.c	/^int recv_file_list(SSL *ssl,int order)$/;"	f
+remove_space	client/clnt_parse.c	/^void remove_space(char *src,char *dest)$/;"	f
+scan_local_files	client/clnt_parse.c	/^void scan_local_files(void)$/;"	f
+scan_serv_files	client/clnt_parse.c	/^int scan_serv_files(SSL *ssl,int order)$/;"	f
+serv_ack_code	share/sftpack.c	/^int serv_ack_code(SSL *ssl,int order)$/;"	f
+setnonblocking	server/myepoll.c	/^int setnonblocking(int sockfd)$/;"	f
+sft_pack	share/sftpack.h	/^typedef struct sft_pack{$/;"	s
+sftdata	share/sftpack.h	/^typedef union sftdata{$/;"	u
+sftfile_get_name	share/sftfile.c	/^int sftfile_get_name(char *filename,char *prompt)$/;"	f
+sftfile_get_size	share/sftfile.c	/^int sftfile_get_size(char *filename)$/;"	f
+sftfile_open	share/sftfile.c	/^int sftfile_open(char *filename,int flags)$/;"	f
+sftfile_recv	share/sftfile.c	/^int sftfile_recv(SSL *ssl,int order,int fd)$/;"	f
+sftfile_recvdir	share/sftfile.c	/^void sftfile_recvdir(char *fdir)$/;"	f
+sftfile_send	share/sftfile.c	/^int sftfile_send(SSL *ssl,int order,int fd)$/;"	f
+sftpack_init	share/sftpack.c	/^void sftpack_init(SFT_PACK *sftpack)$/;"	f
+sftpack_recv	share/sftpack.c	/^int sftpack_recv(SSL *ssl,SFT_PACK *sftpack)$/;"	f
+sftpack_send	share/sftpack.c	/^int sftpack_send(SSL *ssl,SFT_PACK *sftpack)$/;"	f
+sftpack_wrap	share/sftpack.c	/^int sftpack_wrap(SFT_PACK *sftpack,int order,int ack,char *buf)$/;"	f
+show_Mlogin	client/client.c	/^int show_Mlogin(SSL *ssl)$/;"	f
+show_Mmain	client/client.c	/^int show_Mmain(SSL *ssl)$/;"	f
+size	share/sftfile.h	/^	int size;	$/;"	m	struct:file_attr
+sock_init	client/client.c	/^int sock_init(void)$/;"	f
+socket_init	server/server.c	/^int socket_init(int lisnum,char **argv)$/;"	f
+sockfd	server/sockssl.h	/^	int sockfd;$/;"	m	struct:sockssl
+sockssl	server/sockssl.h	/^typedef struct sockssl{$/;"	s
+sockssl_bind	server/sockssl.c	/^int sockssl_bind(SOCKSSL *sockssl,int size,SSL *ssl,int sockfd)$/;"	f
+sockssl_init	server/sockssl.c	/^int sockssl_init(SOCKSSL *sockssl,int size)$/;"	f
+sockssl_search	server/sockssl.c	/^int sockssl_search(SOCKSSL *sockssl,int size,int sockfd)$/;"	f
+sockssl_unbind	server/sockssl.c	/^int sockssl_unbind(SOCKSSL *sockssl,int size,int sockfd)$/;"	f
+ssl	server/sockssl.h	/^	SSL *ssl;$/;"	m	struct:sockssl
+ssl_close_pk	share/ssl_wrap.c	/^int ssl_close_pk(SSL_CTX *ctx, SSL *ssl, int sockfd, int new_fd)$/;"	f
+ssl_load_cert_priv	share/ssl_wrap.c	/^void ssl_load_cert_priv(SSL_CTX *ctx)$/;"	f
+ssl_load_pk	share/ssl_wrap.c	/^int ssl_load_pk(SSL_CTX *ctx, char *certificate, char *privateKey)$/;"	f
+upload_files	client/clnt_parse.c	/^int upload_files(SSL *ssl,int order)$/;"	f
+user	share/sftpack.h	/^	ACCOUNT user;	$/;"	m	union:sftdata

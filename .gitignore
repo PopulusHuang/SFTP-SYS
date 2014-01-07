@@ -1,0 +1,7 @@
+*.log
+*.[oa]
+*~
+*.out
+*.swp
+server/client_file/*
+client/recv_dir/*

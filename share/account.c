@@ -90,14 +90,33 @@ int account_register(sqlite3 *db,char *username,char *passwd)
 	}
 		return ;
 }
+/* cut blank character */
+void cut_blank(char *src,char *dest)
+{
+	int i,j,n;
+	n = strlen(src);
+	for(i = 0,j = 0;i < n;i++)
+	{
+		if(src[i] == ' ')	
+		{
+			continue;
+		}
+		else
+		{
+			dest[j++] = src[i];
+		}
+	}
+	dest[j] = '\0';
+}
 /* send account to server */
 int account_send(SSL *ssl,ACCOUNT user,int order)
 {
 	SFT_PACK sftpack;		
-	SFT_DATA data;
+
 	/* pack data */
 	sftpack_wrap(&sftpack,order,INVAILD,"");
-	sftpack.data.user = user;
+	cut_blank(user.name,sftpack.data.user.name);
+	strcpy(sftpack.data.user.passwd,user.passwd);
 	int n = sftpack_send(ssl,&sftpack);
 	return n;
 }
