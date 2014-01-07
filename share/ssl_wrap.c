@@ -1,5 +1,16 @@
 #include "ssl_wrap.h"
+#include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+#if 0
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#endif
 /* load  secret key and  verify */
 int ssl_load_pk(SSL_CTX *ctx, char *certificate, char *privateKey)
 {
@@ -56,61 +67,28 @@ int SSL_read_pk(SSL *ssl, void *buf, int num)
 	}
 	return n;
 }
-/* init sockssl by default,the 'size' is the length of sockssl */
-int init_sockssl(SOCKSSL *sockssl,int size)
+/* current path */
+void Getcwd(char *pwd,int size)
 {
-	int i;
-	for (i = 0; i < size; i++) {
-		sockssl[i].sockfd = INVAILD;	
-		sockssl[i].ssl = NULL;
-	}
-}
-/* find the index of 'sockfd' in sockssl array */
-int search_sockssl(SOCKSSL *sockssl,int size,int sockfd)
-{
-	int i;
-	for (i = 0; i < size ; i++) {
-		if(sockssl[i].sockfd == sockfd)	
-		{
-			return i;
-		}
-	}
-	return -1;
-}
-/* add socket and ssl */
-int add_sockssl(SOCKSSL *sockssl,int size,SSL *ssl,int sockfd)
-{
-	int i;	
-	/* add to invaild item,INVAILD was define at ssl_wrap.h */
-	i = search_sockssl(sockssl,size,INVAILD);
-	if( i >= 0)
+	getcwd(pwd,size);
+  	if(strlen(pwd)==1)
 	{
-		sockssl[i].sockfd = sockfd;	
-		sockssl[i].ssl = ssl;
-		return 0;
+		pwd[0]='\0';
 	}
-	return -1;
 }
-int remove_sockssl(SOCKSSL *sockssl,int size,int sockfd)
+/* Load the user's digital certificate of current 
+ * directory that is used to send to the client. 
+ * A certificate containing a public key*/
+void ssl_load_cert_priv(SSL_CTX *ctx)
 {
-	int i;
-	i = search_sockssl(sockssl,size,sockfd);
-	if(i >= 0)
-	{
-		sockssl[i].sockfd = INVAILD;	
-		sockssl[i].ssl = NULL;
-		return 0;
-	}
-	return -1;
-}
-SSL *get_sockssl(SOCKSSL *sockssl,int size,int sockfd)
-{
-	SSL *ssl = NULL;
-	int i;
-	i = search_sockssl(sockssl,size,sockfd);
-	if(i >= 0)
-	{
-		ssl = sockssl[i].ssl;	
-	}
-	return ssl;
+  char certpwd[100];
+  char privpwd[100];
+  char *certificate;
+  char *privkey;
+  /* get the current path */
+  Getcwd(certpwd,100);
+  certificate=strcat(certpwd,"/cacert.pem");
+  Getcwd(privpwd,100);
+  privkey=strcat(privpwd,"/privkey.pem");
+  ssl_load_pk(ctx,certificate,privkey);
 }

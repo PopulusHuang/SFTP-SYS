@@ -5,20 +5,16 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "srv_parse.h"
+#include "../share/ssl_wrap.h"
+#include "../share/sock_wrap.h"
 #include "myepoll.h"
+#include "sockssl.h"
 #define MAXBUF 1024
 #define SERV_PORT 7838
 #define MAX_EVENT 100
-void Getcwd(char *pwd,int size)
-{
-	getcwd(pwd,size);
-  	if(strlen(pwd)==1)
-	{
-		pwd[0]='\0';
-	}
-}
 void arg_init(char **argv,int *lisnum,int *myport)
 {
+  /* set port */
   if (argv[1])
     *myport = atoi(argv[1]);
   else
@@ -26,7 +22,7 @@ void arg_init(char **argv,int *lisnum,int *myport)
     *myport = SERV_PORT;
     argv[2]=argv[3]=NULL;
   }
-
+  /*set listen backlog */
   if (argv[2])
     *lisnum = atoi(argv[2]);
   else
@@ -34,39 +30,6 @@ void arg_init(char **argv,int *lisnum,int *myport)
     *lisnum = 2;
     argv[3]=NULL;
   }
-}
-/* create the receive directly */
-void create_recvdir()
-{
-  char *fdir="client_file";		/*receive file's path*/
-  mode_t mode;
-  mode=0755;
-  /*Is the directly exist*/
-  if(access(fdir,F_OK) != 0) 
-  {
-  	mkdir(fdir,mode);
-  }
-}
-/* receive file name from client,and create an empty file with it*/
-int create_recvfile(SSL *ssl,char *new_fileName,char *buf)
-{
-	int n = 0;
-	int fd;
-	n = strlen(new_fileName);
-    bzero(buf, MAXBUF + 1);
-    bzero(new_fileName+n, n);
-    n = SSL_read(ssl, buf, MAXBUF);	/* read the file name from client */
-    if(n == 0)
-      printf("Receive File Name '%s'Complete !\n",buf);
-    else if(n < 0)
-      printf("Failure to receive message ! Error code is %d，Error messages are '%s'\n", errno, strerror(errno));
-    if((fd = open(strcat(new_fileName,buf),O_CREAT | O_TRUNC | O_RDWR,0666))<0)
-    {
-      perror("open:");
-	  return -1;
-    }
-	printf("open file:%s succeed\n",new_fileName);
-	return fd;
 }
 int socket_init(int lisnum,char **argv)
 {
@@ -86,21 +49,13 @@ int socket_init(int lisnum,char **argv)
 	Listen(sockfd, lisnum);
   return sockfd;
 }
-/* Load the user's digital certificate that 
- * is used to send to the client. 
- * A certificate containing a public key*/
-void ssl_load_cert_priv(SSL_CTX *ctx)
+int clnt_close(SSL *ssl,SOCKSSL *sockssl,int connfd)
 {
-  char certpwd[100];
-  char privpwd[100];
-  char *certificate;
-  char *privkey;
-  Getcwd(certpwd,100);
-  certificate=strcat(certpwd,"/cacert.pem");
-  Getcwd(privpwd,100);
-  privkey=strcat(privpwd,"/privkey.pem");
-  ssl_load_pk(ctx,certificate,privkey);
 
+	close(connfd);
+	SSL_shutdown(ssl);
+	SSL_free(ssl);
+  	sockssl_unbind(sockssl,SOCKSSL_SIZE,connfd);
 }
 int main(int argc, char **argv)
 {
@@ -140,7 +95,7 @@ int main(int argc, char **argv)
   }
 #endif
   puts("ssl init");
-  create_recvdir();
+  sftfile_recvdir("./client_file");
 
   ssl_load_cert_priv(ctx);
   /*---------- setup a socket monitor-----------------*/
@@ -148,17 +103,15 @@ int main(int argc, char **argv)
   int i; 
   int epfd;	/* epoll file describes */
   int all_event_num ;/* event number*/
-  int cur_event_num = 10;/* current event number */
+  int cur_event_num = 1;/* current event number */
   SOCKSSL sockssl[SOCKSSL_SIZE]; /* socket's ssl */
   struct epoll_event ev;
   struct epoll_event events[MAX_EVENT];	 
-  char data[DATA_SIZE];
 
-  bzero(data,sizeof(data));
   epfd = epoll_create(MAX_EVENT);
   Event_add(epfd,sockfd,&ev);
   /* init sockssl array */
-  init_sockssl(sockssl,SOCKSSL_SIZE); 
+  sockssl_init(sockssl,SOCKSSL_SIZE); 
   /* Accept client connection */
   len = sizeof(struct sockaddr);
   SSL *ssl;
@@ -175,21 +128,19 @@ int main(int argc, char **argv)
 		  {
 	         int new_connfd = Accept(sockfd, (struct sockaddr *) &their_addr, &len);
              printf("server: got connection from %s, port %d, socket %d\n", 
-			 inet_ntoa(their_addr.sin_addr), 
-			 ntohs(their_addr.sin_port), 
-			 new_connfd);
+			 		inet_ntoa(their_addr.sin_addr), 
+			 		ntohs(their_addr.sin_port), 
+			 		new_connfd);
     		ssl = SSL_new(ctx);
 		    /* insert user's socket to SSL */
 		    SSL_set_fd(ssl, new_connfd);
-			add_sockssl(sockssl,SOCKSSL_SIZE,ssl,new_connfd);
+			/* bind the socket and ssl */
+			sockssl_bind(sockssl,SOCKSSL_SIZE,ssl,new_connfd);
 		    /* establish SSL connection */
 		    if (SSL_accept(ssl) == -1)
 		    {
 		      perror("accept");
-    		  SSL_shutdown(ssl);  /* close ssl connection */
-   			  SSL_free(ssl);		/* free ssl */
-		      close(new_connfd);
-			  remove_sockssl(sockssl,SOCKSSL_SIZE,new_connfd);
+			  clnt_close(ssl,sockssl,new_connfd);
 			  continue;
 		    }
 			 setnonblocking(new_connfd);
@@ -200,32 +151,22 @@ int main(int argc, char **argv)
 		  {
 			int n,nread;
 			 connfd = events[i].data.fd; 
-			 n = search_sockssl(sockssl,SOCKSSL_SIZE,connfd);
-
-			 //nread = SSL_read_pk(sockssl[n].ssl,data,DATA_SIZE-1);
+			 sftpack_init(&clnt_pack);
+			 n = sockssl_search(sockssl,SOCKSSL_SIZE,connfd);
+			 /* receive the package */
 			 nread = sftpack_recv(sockssl[n].ssl,&clnt_pack);
-			 if(nread > 0)
+			 if(nread > 0)	/* parse client's package */
 			 {
 			 	ret = parse_clnt_pack(sockssl[n].ssl,&clnt_pack,db);
 			 }
-			 sftpack_init(&clnt_pack);
-
-			  if((nread <= 0)||(ret ==COUT))
-			  {
-#if 1
+			 if(ret == COUT || nread <= 0)	/* client logout*/
+			 {
 				printf("client logout\n");
-				close(connfd);
-				SSL_shutdown(sockssl[n].ssl);
-				SSL_free(sockssl[n].ssl);
-				/* remove the sockssl */
-				sockssl[n].ssl = NULL;
-				sockssl[n].sockfd = INVAILD;
+			    clnt_close(ssl,sockssl,connfd);
 			 	epoll_ctl(epfd,EPOLL_CTL_DEL,connfd,&events[i]);
 				cur_event_num--;
-#endif
-			  }
+			 }
 		  }
-    //close(connfd);		/* close client socket */
 	  }
   }
 

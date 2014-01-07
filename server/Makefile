@@ -1,4 +1,4 @@
-obj_srv=server.o srv_handle.o myepoll.o
+obj_srv=server.o srv_handle.o myepoll.o sockssl.o
 obj_ssl=../share/ssl_wrap.o
 obj_sock=../share/sock_wrap.o
 obj_account=../share/account.o
