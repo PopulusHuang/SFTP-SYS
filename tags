@@ -53,8 +53,11 @@ MAXBUF	client/client.c	15;"	d	file:
 MAXBUF	server/server.c	12;"	d	file:
 MAX_EVENT	server/server.c	14;"	d	file:
 Mlogin	client/menu.c	/^int Mlogin(void)$/;"	f
+Mlogin	server/client_file/menu.c	/^int Mlogin(void)$/;"	f
 Mmain	client/menu.c	/^int Mmain(void)$/;"	f
+Mmain	server/client_file/menu.c	/^int Mmain(void)$/;"	f
 Moption	client/menu.c	/^int Moption(void)$/;"	f
+Moption	server/client_file/menu.c	/^int Moption(void)$/;"	f
 NAME_SIZE	share/account.h	5;"	d
 NOT_FOUND	share/sftpack.h	18;"	d
 ORDER_NUM	share/sftpack.h	33;"	d
@@ -109,6 +112,7 @@ buf	share/sftpack.h	/^		char buf[DATA_SIZE];$/;"	m	struct:sft_pack
 clnt_close	server/server.c	/^int clnt_close(SSL *ssl,SOCKSSL *sockssl,int connfd)$/;"	f
 clnt_login	client/clnt_parse.c	/^int clnt_login(SSL *ssl,int order)$/;"	f
 clnt_register	client/clnt_parse.c	/^int clnt_register(SSL *ssl,int order)$/;"	f
+cut_blank	share/account.c	/^void cut_blank(char *src,char *dest)$/;"	f
 cut_path	client/clnt_parse.c	/^int cut_path(char *filename)$/;"	f
 data	share/sftpack.h	/^		SFT_DATA data;$/;"	m	struct:sft_pack
 download_files	client/clnt_parse.c	/^int download_files(SSL *ssl,int order)$/;"	f
@@ -160,12 +164,16 @@ serv_ack_code	share/sftpack.c	/^int serv_ack_code(SSL *ssl,int order)$/;"	f
 setnonblocking	server/myepoll.c	/^int setnonblocking(int sockfd)$/;"	f
 sft_pack	share/sftpack.h	/^typedef struct sft_pack{$/;"	s
 sftdata	share/sftpack.h	/^typedef union sftdata{$/;"	u
+sftfile_fopen	share/sftfile.c	/^FILE *sftfile_fopen(char *filename,char *mode)$/;"	f
+sftfile_frecv	share/sftfile.c	/^int sftfile_frecv(SSL *ssl,int order,FILE *fp,int file_size)$/;"	f
+sftfile_fsend	share/sftfile.c	/^int sftfile_fsend(SSL *ssl,int order,FILE *fp,int file_size)$/;"	f
 sftfile_get_name	share/sftfile.c	/^int sftfile_get_name(char *filename,char *prompt)$/;"	f
 sftfile_get_size	share/sftfile.c	/^int sftfile_get_size(char *filename)$/;"	f
 sftfile_open	share/sftfile.c	/^int sftfile_open(char *filename,int flags)$/;"	f
-sftfile_recv	share/sftfile.c	/^int sftfile_recv(SSL *ssl,int order,int fd)$/;"	f
+sftfile_progress	share/sftfile.c	/^int sftfile_progress(float size,float total)$/;"	f
+sftfile_recv	share/sftfile.c	/^int sftfile_recv(SSL *ssl,int order,int fd,int file_size)$/;"	f
 sftfile_recvdir	share/sftfile.c	/^void sftfile_recvdir(char *fdir)$/;"	f
-sftfile_send	share/sftfile.c	/^int sftfile_send(SSL *ssl,int order,int fd)$/;"	f
+sftfile_send	share/sftfile.c	/^int sftfile_send(SSL *ssl,int order,int fd,int file_size)$/;"	f
 sftpack_init	share/sftpack.c	/^void sftpack_init(SFT_PACK *sftpack)$/;"	f
 sftpack_recv	share/sftpack.c	/^int sftpack_recv(SSL *ssl,SFT_PACK *sftpack)$/;"	f
 sftpack_send	share/sftpack.c	/^int sftpack_send(SSL *ssl,SFT_PACK *sftpack)$/;"	f

@@ -77,6 +77,8 @@ int handle_recv_file(SSL *ssl,SFT_PACK *clnt_pack)
 	{
 		sprintf(filename,"%s%s",path,clnt_pack->data.file_attr.name);
 		fd = sftfile_open(filename,O_CREAT|O_RDWR|O_TRUNC);
+	//	fd = sftfile_fopen(filename,"wb");
+#if 1
 		if(fd < 0)
 		{
 			sftpack_wrap(&ack_pack,order,FAIL,"\0");
@@ -85,10 +87,12 @@ int handle_recv_file(SSL *ssl,SFT_PACK *clnt_pack)
 		}
 		else
 		{
+			//printf("open %s succeed!\n",filename);
 			sftpack_wrap(&ack_pack,order,ACCEPT,"\0");
 			sftpack_send(ssl,&ack_pack);
 		}
 		sleep(1);	/*wait for client to send file*/
+#endif
 		if(sftfile_recv(ssl,ack_pack.order,fd,file_size)==0)
 		{
 			sftpack_wrap(&ack_pack,order,FINISH,"\0");

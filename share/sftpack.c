@@ -26,7 +26,11 @@ int sftpack_wrap(SFT_PACK *sftpack,int order,int ack,char *buf)
 	sftpack_init(sftpack);
 	sftpack->order = order;
 	sftpack->ack = ack;
-	strncpy(sftpack->buf,buf,DATA_SIZE);
+	/* non-text files contain some '\0' characters ,so it  
+	 * will lose some message even cause garbled code when 
+	 * use strcpy. */
+	memcpy(sftpack->buf,buf,DATA_SIZE);
+	
 	return 0;
 }
 /* send package */
@@ -59,7 +63,6 @@ int serv_ack_code(SSL *ssl,int order)
 	int n = 0;
 	do{
 	/* get respond from server */	
-		
 		if(sftpack_recv(ssl,&sftpack) > 0)	/* get pack */
 			break;
 		printf("server is busy,wait for a moment...\n");

@@ -244,10 +244,32 @@ int cut_path(char *filename)
 #endif
   	return 0;
 }
+int file_backup(char *filename,int fd)
+{
+	int bakfd;
+	char path[FILENAME_SIZE] = "./recv_dir/";
+	char bakname[FILENAME_SIZE];
+	char buf[DATA_SIZE];
+	int n;
+	bzero(path,sizeof(path));
+	bzero(bakname,sizeof(bakname));
+	strcpy(bakname,filename);
+	cut_path(bakname);
+	strcat(path,bakname);
+	bakfd = sftfile_open(path,O_RDWR|O_CREAT|O_TRUNC);
+	if(bakfd < 0)
+			return -1;
+	while((n = read(fd,buf,DATA_SIZE-1)) > 0)
+	{
+		write(bakfd,buf,n);	
+	}
+	return 0;
+}
 /* upload files to server */
 int upload_files(SSL *ssl,int order)
 {
-  	int n,fd;
+  	int n;
+	int fd;
 	SFT_PACK pack;
 	SFT_DATA data;
 	char filename[FILENAME_SIZE];
@@ -260,6 +282,10 @@ int upload_files(SSL *ssl,int order)
 	{
 		return -1;	
 	}
+#if 0
+	if(file_backup(filename,fd) < 0)
+			return -1;
+#endif 
 	file_size = sftfile_get_size(filename);
 	cut_path(filename);
 	data.file_attr.size = file_size;
@@ -268,9 +294,9 @@ int upload_files(SSL *ssl,int order)
 	sftpack_wrap(&pack,order,ASK,"\0");	
 	pack.data = data;
 	sftpack_send(ssl,&pack);
+#if 1
 	/* get respond */
 	n = serv_ack_code(ssl,order);
-#if 1
 	if(n == ACCEPT)
 	{
 	 sftfile_send(ssl,order,fd,file_size);
