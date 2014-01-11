@@ -1,12 +1,29 @@
 #include "menu.h"
+#include "ui.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include "../share/sftpack.h"
+int get_order(int n,int min,int max)
+{
+	int order;	
+
+	if((n >= min) && (n <= max))
+	{
+		order = order_set[n];
+	}
+	else
+	{
+		printf(RED"Please input a number between %d and %d ! Or input a negative to quit.\n"NONE,min,max);
+		order = CNULL;
+	}
+	return order;
+}
 /* get the option number */
 int Moption(void)
 {
 	int n;
-	printf("please input a number:");
+	printf(RED"Please input a number: "NONE);
 	scanf("%d",&n);
 	getchar();
 	return n;
@@ -15,47 +32,48 @@ int Moption(void)
 int Mlogin(void)
 {
 	int order = CNULL;
-loop:printf("\n\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
-	 printf("\033[31m|  1. login               |\033[0m\n");
-	 printf("\033[31m|  2. register            |\033[0m\n");
-	 printf("\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
-	int n = Moption();	
-#if 1
-	if ( n < 3 && n > 0)
+	do
 	{
-		/* get the order code */
-		order = order_set[n];
-	}
-	else
-	{
-		printf("error,please input number 1 or 2!\n");	
-		goto loop;
-	}
-#endif
+		start_ui();
+		int n = Moption();	
+		order = get_order(n,1,2);
+		assert(order);
+	}while(order == CNULL);
 	return order;
 }
 /* print the main menu */
 int Mmain(void)
 {
 	  int order = CNULL;
-loop: printf("\n\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
-	  printf("\033[31m|  1. explore local files     |\033[0m\n");
-	  printf("\033[31m|  2. explore server files    |\033[0m\n");
-	  printf("\033[31m|  3. upload files            |\033[0m\n");
-	  printf("\033[31m|  4. download files          |\033[0m\n");
-	  printf("\033[31m|  5. logout                  |\033[0m\n");
-	  printf("\033[31m+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+\033[0m\n");
-	int n = Moption() + 2;	
-#if 1
-	if (n < 8 && n > 2)
+	  int n;
+	  do
+	  {
+		primary_ui();
+		n = Moption() + 2;	
+		if( n > 2 && n < 9)
+			order = order_set[n];
+		assert(order);
+	  }while(order == CNULL);
+	return order;
+}
+int Mlist(void)
+{
+	int order = CNULL;	
+	int n;
+	do
 	{
-		order = order_set[n];
-	}
-	else
-	{
-		printf("error,please input a number between 1 and 5!\n");	
-		goto loop;
-	}
-#endif
+		list_ui();
+		n = Moption() + 8;
+		printf("Mlist:n=%d\n",n);
+		if(n > 8&& n < 13)
+		{
+			order = order_set[n];
+		}
+		else
+		{
+			printf(RED"Please input a number between %d and %d ! Or input a negative to quit.\n"NONE,1,3);
+		}
+		assert(order);
+	}while(order == CNULL);
 	return order;
 }

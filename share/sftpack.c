@@ -2,7 +2,7 @@
 #include <string.h>
 #define INVAILD		-1
 /* order set */
-int order_set[ORDER_NUM] = {40,41,42,43,44,45,46,47};
+int order_set[ORDER_NUM] = {40,41,42,43,44,45,46,47,48,49,50,51};
 /* check order,and return the order index int the order set */
 int order_isexist(int order)
 {
@@ -54,6 +54,36 @@ int sftpack_recv(SSL *ssl,SFT_PACK *sftpack)
 		perror("sftpack_recv:");	
 	}
 	return n;
+}
+/* send ack package*/
+int sftpack_send_ack(SSL *ssl,int order,int ack)
+{
+	SFT_PACK pack;	
+	int n = 0;
+	sftpack_wrap(&pack,order,ack,"");
+	n = sftpack_send(ssl,&pack);
+	return n;
+}
+/* receive ack package */
+int sftpack_recv_ack(SSL *ssl,int order)
+{
+	SFT_PACK sftpack;
+	int ret = -1;
+	int n = 0;
+	do{
+	/* get respond from server */	
+		if(sftpack_recv(ssl,&sftpack) > 0)	/* get pack */
+			break;
+		else
+		{
+			printf("server is busy,wait for a moment...\n");
+			sleep(1);	/* wait respond*/
+			n++;
+		}
+	}while(n < 3);
+	if(sftpack.order == order)
+		ret = sftpack.ack;
+	return ret;
 }
 /* get server respond */
 int serv_ack_code(SSL *ssl,int order)

@@ -1,14 +1,16 @@
 /*clnt_parse.c*/
 #include "clnt_parse.h"
 #include "echo_mode.h"
+#include "../share/list.h"
 #include "../share/sftpack.h"
+#include "../share/ui.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #define BUF_SIZE 1024
 #define CLIENT_PATH  1
 #define SERVER_PATH  2
-char login_name[NAME_SIZE] = "\0";
+char login_name[FILENAME_SIZE] = "\0";
 
 /* parse the client order */
 int parse_clnt_order(SSL *ssl,int order)
@@ -25,15 +27,36 @@ int parse_clnt_order(SSL *ssl,int order)
 	{
 		case   CIN:  ret = clnt_login(ssl,order);break;
 		case  CREG:  ret = clnt_register(ssl,order);break;
-		case  CSCL:  scan_local_files();break;
-		case  CSCS:  scan_serv_files(ssl,order);break; 
+		case CLIST:  scan_main(ssl,order);break;
 		case   CUP:  upload_files(ssl,order);break;
 		case CDOWN:  download_files(ssl,order);break;
+		case CALTER_PASSWD: modify_passwd(ssl,order);break;
+		case CONSOLE:	console(ssl,order);break;
 		case  COUT:  ret=logout(ssl,order);break;
 		default:     fprintf(stderr,"null order!\n");	
 					 	ret = -1;break;
 	}
 	return ret;
+}
+int modify_passwd(SSL *ssl,int order)
+{
+	return 0;
+}
+int console(SSL *ssl,int order)
+{
+	char buf[BUF_SIZE];
+	memset(buf,0,sizeof(buf));
+	printf(RED"Enter 'help' to see help."NONE"\n");
+	while(1)
+	{
+		printf(">>");
+		fgets(buf,BUF_SIZE-1,stdin);
+		buf[strlen(buf)-1] = '\0';
+		if(strcmp(buf,"exit") == 0)
+			break;
+		system(buf);
+	}
+	return 0;
 }
 /* handle client login */
 int clnt_login(SSL *ssl,int order)
@@ -46,11 +69,12 @@ login:	account_input(account.name,"User Name: ",NAME_SIZE);
 		echo_mode(STDIN_FILENO,ECHO_OFF);	/* set echo off */
 pwloop:	account_input(account.passwd,"\nPasswd: ",PASSWD_SIZE);
 		echo_mode(STDIN_FILENO,ECHO_ON);	/* set echo on */
+		printf("\n");
 
 		/* send account message to server */
 		account_send(ssl,account,order);
 		/* get respond from server */	
-		int n = serv_ack_code(ssl,order);
+		int n = sftpack_recv_ack(ssl,order);
 		switch(n)
 		{
  			/* entry succeed */
@@ -99,7 +123,7 @@ pwloop:	account_input(account.passwd,"\nNew Passwd: ",PASSWD_SIZE);
 		{
 			account_send(ssl,account,order);
 			/* get respond from server */	
-			int n = serv_ack_code(ssl,order);
+			int n = sftpack_recv_ack(ssl,order);
 			if(n == REGISTER_OK)
 			{
 				printf("%s register succeed!\n",account.name);
@@ -110,6 +134,7 @@ pwloop:	account_input(account.passwd,"\nNew Passwd: ",PASSWD_SIZE);
 				fprintf(stderr,"%s is already exist\n",account.name);	
 			}
 		}
+		printf("\n");
 		return n;
 }
 /* remove string's blank character from 'src' 
@@ -134,38 +159,34 @@ void remove_space(char *src,char *dest)
 /* scan client's local files */
 void scan_local_files(void)
 {
-	char cmd_buf[BUF_SIZE];
+	char scan_path[PATH_SIZE];
 
-	bzero(cmd_buf,sizeof(cmd_buf));
+	memset(scan_path,0,sizeof(scan_path));
 	while(1)
 	{
-		if(get_path(cmd_buf,CLIENT_PATH) < 0)
+		if(get_path(scan_path,"local") < 0)
 				break;
-		system(cmd_buf);
+		list_client(scan_path,"-lhF --color=auto");
 	}
 }
 /* input the path to scan */
-int get_path(char *scan_path,int flag)
+int get_path(char *scan_path,char *prompt)
 {
 		char buf[BUF_SIZE];	
-		char path[BUF_SIZE];
-		bzero(path,sizeof(path));
+		bzero(buf,sizeof(buf));
 		printf("\033[31m@~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~@ \033[0m\n");
 		printf("\033[31m >>Enter 'quit' or 'exit' to goback!\033[0m\n");
 
-		if(flag == CLIENT_PATH)
-			printf("\n\033[47;32m please input the path of \033[33mlocal:~$ \033[0m");
-		else
-			printf("\n\033[47;32m please input the path of \033[33mserver:~$ \033[0m");
+		printf("\n\033[47;32m please input the path of >\033[31m%s:~$ \033[0m",prompt);
 
 		fgets(buf,BUF_SIZE,stdin);
 		buf[strlen(buf)-1] = '\0';
 		/* remove blank character and copy to path*/
-		remove_space(buf,path);
-		if(strcmp(path,"quit")==0||strcmp(path,"exit")==0)
+		remove_space(buf,scan_path);
+		if(strcmp(scan_path,"quit")==0||strcmp(scan_path,"exit")==0)
 				return -1;
-		strcpy(scan_path,"ls -l --color=auto ");
-		strcat(scan_path,path);
+		//strcpy(scan_path,"ls -l --color=auto ");
+		//strcpy(scan_path,path);
 		return 0;
 }
 /* Receive file list from server */
@@ -190,33 +211,26 @@ int recv_file_list(SSL *ssl,int order)
 	}
 	return 0;
 }
-/* scan server files */
+/* scan user files on the server */
 int scan_serv_files(SSL *ssl,int order)
 {
-	int ack;
-	SFT_PACK pack;
-	char buf[DATA_SIZE];
+	//int ack;
+	//SFT_PACK pack;
+	char path[DATA_SIZE];
 	char scan_path[DATA_SIZE];
 
-	//bzero(scan_path,sizeof(scan_path));
 	memset(scan_path,0,sizeof(scan_path));
 	/*input the server path*/
-	while(get_path(scan_path,SERVER_PATH) != -1)
+	while(get_path(path,"server") != -1)
 	{
-		strcpy(buf,scan_path);
 		/* send the path to server */
-		sftpack_wrap(&pack,order,ASK,buf);
-		sftpack_send(ssl,&pack);
-		/* get respond */
-		ack = serv_ack_code(ssl,order);
-		if(ack == ACCEPT)	/* server accept,start to receive file list */
+		if(strstr(path,"..")!=NULL)
 		{
-			recv_file_list(ssl,order);	
+			fprintf(stderr,"Path error:deny contain '..'\n");	
+			return -1;
 		}
-		else
-		{
-			fprintf(stderr,"request file list failure!\n");
-		}
+		sprintf(scan_path,"%s/%s",login_name,path);
+		list_server(ssl,order,scan_path," -lhgaoF ");
 	}
 	return 0;
 }
@@ -244,27 +258,6 @@ int cut_path(char *filename)
 #endif
   	return 0;
 }
-int file_backup(char *filename,int fd)
-{
-	int bakfd;
-	char path[FILENAME_SIZE] = "./recv_dir/";
-	char bakname[FILENAME_SIZE];
-	char buf[DATA_SIZE];
-	int n;
-	bzero(path,sizeof(path));
-	bzero(bakname,sizeof(bakname));
-	strcpy(bakname,filename);
-	cut_path(bakname);
-	strcat(path,bakname);
-	bakfd = sftfile_open(path,O_RDWR|O_CREAT|O_TRUNC);
-	if(bakfd < 0)
-			return -1;
-	while((n = read(fd,buf,DATA_SIZE-1)) > 0)
-	{
-		write(bakfd,buf,n);	
-	}
-	return 0;
-}
 /* upload files to server */
 int upload_files(SSL *ssl,int order)
 {
@@ -282,25 +275,22 @@ int upload_files(SSL *ssl,int order)
 	{
 		return -1;	
 	}
-#if 0
-	if(file_backup(filename,fd) < 0)
-			return -1;
-#endif 
 	file_size = sftfile_get_size(filename);
 	cut_path(filename);
+	sprintf(data.file_attr.name,"%s/%s",login_name,filename);
 	data.file_attr.size = file_size;
-	strcpy(data.file_attr.name,filename);
+	//strcpy(data.file_attr.name,filename);
 	/* package data and send */
 	sftpack_wrap(&pack,order,ASK,"\0");	
 	pack.data = data;
 	sftpack_send(ssl,&pack);
 #if 1
 	/* get respond */
-	n = serv_ack_code(ssl,order);
+	n = sftpack_recv_ack(ssl,order);
 	if(n == ACCEPT)
 	{
 	 sftfile_send(ssl,order,fd,file_size);
-	 n = serv_ack_code(ssl,order);
+	 n = sftpack_recv_ack(ssl,order);
 	 if(n == FINISH)
 	 {
 	 	printf("upload %s to sever succeed,total %0.1fKB\n",
@@ -324,21 +314,29 @@ int download_files(SSL *ssl,int order)
 	int ack,fd;
 	char filename[FILENAME_SIZE];
 	char localname[FILENAME_SIZE];
-	char *path = "./recv_dir/";
+	char *local_path = "./SFT_DOWNLOAD/";
 	SFT_PACK pack;
 	SFT_DATA data;
-	sftfile_recvdir(path);
+	sftfile_userdir(local_path);
 
 	bzero(localname,sizeof(localname));
 	/* input filename on server to download */
 	sftfile_get_name(filename,"Download");
-	strcpy(data.file_attr.name,filename);
+	if(strstr(filename,"..")!=NULL)
+	{
+		fprintf(stderr,"filename error: deny contain '..'\n");	
+		return -1;
+	}
+	//sprintf(serv_path,"%s/%s",login_name,filename);
+	sprintf(data.file_attr.name,"%s/%s",login_name,filename);
+
 	cut_path(filename);
-	sprintf(localname,"%s%s",path,filename);
+	sprintf(localname,"%s%s",local_path,filename);
 	/*send file information to server */
 	sftpack_wrap(&pack,order,ASK,"");	
 	pack.data = data;
 	sftpack_send(ssl,&pack);
+	/* receive server respond */
 	sftpack_recv(ssl,&pack);
 	ack =pack.ack;
 	if(ack == ACCEPT)
@@ -382,4 +380,30 @@ int logout(SSL *ssl,int order)
 		rtn = COUT;
 	}
 	return rtn;
+}
+int scan_main(SSL *ssl)
+{
+	int order;
+	system("clear");
+	order = Mlist();	
+	switch(order)
+	{
+		case CSCL:	scan_local_files();break;	
+		case CSCS:	scan_serv_files(ssl,order);break;
+		case CSCLS: scan_all(ssl);break;	
+		default: fprintf(stderr,"No such option!\n");
+				 return -1;
+	}
+	return 0;
+}
+int scan_all(SSL *ssl)
+{
+		system("clear");
+printf(GREEN_BG"|                             Sever List                          |"NONE"\n");           
+	list_server(ssl,49,login_name,"-x");	
+	divline_ui();
+
+printf(GREEN_BG"|                             Client List                         |"NONE"\n");           
+	list_client(" ","");
+	divline_ui();
 }

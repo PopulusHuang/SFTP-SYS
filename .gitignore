@@ -5,3 +5,7 @@
 *.swp
 server/client_file/*
 client/recv_dir/*
+server/resource/
+server/User/
+client/SFT_DOWNLOAD/
+database

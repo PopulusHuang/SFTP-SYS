@@ -95,7 +95,7 @@ int main(int argc, char **argv)
   }
 #endif
   puts("ssl init");
-  sftfile_recvdir("./client_file");
+  sftfile_userdir("./User");
 
   ssl_load_cert_priv(ctx);
   /*---------- setup a socket monitor-----------------*/

@@ -106,7 +106,7 @@ void cut_blank(char *src,char *dest)
 			dest[j++] = src[i];
 		}
 	}
-	dest[j] = '\0';
+	//dest[j] = '\0';
 }
 /* send account to server */
 int account_send(SSL *ssl,ACCOUNT user,int order)
@@ -118,5 +118,7 @@ int account_send(SSL *ssl,ACCOUNT user,int order)
 	cut_blank(user.name,sftpack.data.user.name);
 	strcpy(sftpack.data.user.passwd,user.passwd);
 	int n = sftpack_send(ssl,&sftpack);
-	return n;
+	if(n > 0)
+		return 0;
+	return -1;
 }

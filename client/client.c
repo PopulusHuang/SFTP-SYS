@@ -10,11 +10,11 @@
 #include "../share/ssl_wrap.h"
 #include "../share/sock_wrap.h"
 #include "../share/sftpack.h"
-#include "menu.h"
+#include "../share/ui.h"
 #include "clnt_parse.h"
 #define MAXBUF 1024
 #define SERV_PORT 7838
-void ShowCerts(SSL * ssl)
+void show_certs(SSL * ssl)
 {
   X509 *cert;
   char *line;
@@ -76,6 +76,7 @@ int show_Mlogin(SSL *ssl)
   int order;
   while(1)
   {
+		 logo_ui();
   	   	 order = Mlogin();  
 		 order = parse_clnt_order(ssl,order);	 
 	     if(order == LOGIN_OK)
@@ -104,6 +105,7 @@ int show_Mmain(SSL *ssl)
 	int order;
 	while(1)
 	{
+//		logo_ui();
 		order = Mmain();	
 		order = parse_clnt_order(ssl,order);
 		if(order == COUT)	/* client logout */
@@ -147,12 +149,14 @@ int main(int argc, char **argv)
   }
   else
   {
+	system("clear");
     printf("Connected with %s encryption\n", SSL_get_cipher(ssl));
-    ShowCerts(ssl);
+    show_certs(ssl);
   }
   int n = show_Mlogin(ssl);
 	if(n == 1)
 	{
+		system("clear");
 		show_Mmain(ssl);
 	}
 	else if(n < 0) 

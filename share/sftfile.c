@@ -1,5 +1,6 @@
 #include "sftfile.h"
 #include "sftpack.h"
+#include "../client/ui.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -24,12 +25,12 @@ FILE *sftfile_fopen(char *filename,char *mode)
 	}
 	return fp;
 }
-/* create the receive directly */
-void sftfile_recvdir(char *fdir)
+/* create the user directory  */
+void sftfile_userdir(char *fdir)
 {
   mode_t mode;
   mode=0755;
-  /*Is the directly exist*/
+  /*Is the directory exist*/
   if(access(fdir,F_OK) != 0) 
   {
   	mkdir(fdir,mode);
@@ -52,9 +53,9 @@ int sftfile_get_size(char *filename)
 int sftfile_get_name(char *filename,char *prompt)
 {
 	
-    printf("\033[31m@~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~@ \033[0m\n");
-    printf("\n\033[31m@Please input the filename:\033[0m\n");
-    printf("\033[33m(~_^)'>%s$ \033[0m",prompt); 
+    printf(RED"@~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~@"NONE"\n");
+    printf("\n"RED"@Please input the filename:"NONE"\n");
+    printf(YELLOW"(~_^)'>%s$ "NONE,prompt); 
 	fgets(filename,FILENAME_SIZE,stdin);
 	filename[strlen(filename)-1] = '\0';
 	return 0;
@@ -66,6 +67,7 @@ int sftfile_progress(float size,float total)
 	progress = (size*100)/total;
 	printf("Progress: %0.0f%%\r",progress);
 	fflush(stdout);
+	return 0;
 }
 /* read data from a file stream and send */
 int sftfile_fsend(SSL *ssl,int order,FILE *fp,int file_size)
@@ -75,6 +77,7 @@ int sftfile_fsend(SSL *ssl,int order,FILE *fp,int file_size)
 	int len;
 	int nread;
 	float send_size = 0;
+	printf(CURSOR_HIDE);
 	while(!feof(fp))
 	{
 		memset(buf,0,sizeof(buf));
@@ -89,6 +92,7 @@ int sftfile_fsend(SSL *ssl,int order,FILE *fp,int file_size)
 			return -1;	
 		sftfile_progress(send_size,file_size);
 	}
+	printf(CURSOR_SHOW);
 	printf("\nsend total %0.1fKB \n",send_size/1024);
 	sftpack_wrap(&pack,order,FINISH,"\0");
 	sftpack_send(ssl,&pack);
@@ -128,6 +132,7 @@ int sftfile_send(SSL *ssl,int order,int fd,int file_size)
 	int len;
 	int nread;
 	float send_size = 0;
+	printf(CURSOR_HIDE);
 	while(1)
 	{
 		sftpack_init(&pack);
@@ -145,7 +150,7 @@ int sftfile_send(SSL *ssl,int order,int fd,int file_size)
 		/* show the rate of progress */
 		sftfile_progress(send_size,file_size);
 	}
-	printf("\n");
+	printf(CURSOR_SHOW);
 	printf("send total %0.1fKB \n",send_size/1024);
 	sftpack_wrap(&pack,order,FINISH,"\0");
 	sftpack_send(ssl,&pack);
@@ -158,6 +163,7 @@ int sftfile_recv(SSL *ssl,int order,int fd,int file_size)
 	int n;
 	float recv_size = 0;
 	sftpack_init(&pack);	
+	printf(CURSOR_HIDE);
 	while(1)
 	{
 		sftpack_recv(ssl,&pack);
@@ -173,6 +179,7 @@ int sftfile_recv(SSL *ssl,int order,int fd,int file_size)
 			usleep(10000);	/* wait for client's data */
 			continue;		
 		}
+		printf("\33[?25h");/* show the cursor */
 		n = pack.data.file_attr.size;
 		recv_size += n;
 		if(Write(fd,pack.buf,n) < 0)
@@ -180,5 +187,6 @@ int sftfile_recv(SSL *ssl,int order,int fd,int file_size)
 		memset(pack.buf,0,DATA_SIZE);
 		sftfile_progress(recv_size,file_size);
 	}
+	printf(CURSOR_SHOW);
 	return 0;
 }
