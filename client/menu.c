@@ -1,5 +1,5 @@
 #include "menu.h"
-#include "ui.h"
+#include "../share/ui.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>

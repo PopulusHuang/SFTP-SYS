@@ -90,6 +90,27 @@ int account_register(sqlite3 *db,char *username,char *passwd)
 	}
 		return ;
 }
+int account_modify_passwd(sqlite3 *db,char *username,char *passwd)
+{
+	char sql[BUF_SIZE];
+	char *zErrMsg = NULL;
+	int ret;
+	int n = -1;
+	memset(sql,0,sizeof(sql));
+	sprintf(sql,"update user set passwd='%s' where name='%s'",passwd,username);	
+	ret = sqlite3_exec(db,sql,NULL,NULL,&zErrMsg);
+	if(ret != SQLITE_OK)
+	{
+		fprintf(stderr,"SQL error:%s\n",zErrMsg);	
+		sqlite3_free(zErrMsg);
+	}
+	else
+	{
+		printf("Modify password succeed!\n");	
+		n = PASSWD_OK;
+	}
+	return n;
+}
 /* cut blank character */
 void cut_blank(char *src,char *dest)
 {

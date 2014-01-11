@@ -14,4 +14,5 @@ int account_input(char *account,char *prompt_info,int size);
 int account_register(sqlite3 *db,char *username,char *passwd);
 int account_send(SSL *ssl,ACCOUNT user,int order);
 int account_verify(sqlite3 *db,char *username,char *passwd);
+int account_modify_passwd(sqlite3 *db,char *username,char *passwd);
 #endif

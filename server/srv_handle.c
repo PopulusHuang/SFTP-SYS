@@ -30,7 +30,19 @@ int handle_register(SSL *ssl,SFT_PACK *clnt_pack,sqlite3 *db)
 	sftpack_send_ack(ssl,clnt_pack->order,ret);
 	return ret;
 }
-
+int handle_modify_passwd(SSL *ssl,SFT_PACK *clnt_pack,sqlite3 *db)
+{
+	ACCOUNT user;
+	int ack,ret;
+	user = clnt_pack->data.user;
+	ret = account_verify(db,user.name,NULL);
+	if(ret == USER_OK)	/* user exist */
+	{
+		ack = account_modify_passwd(db,user.name,user.passwd);	
+	}
+		sftpack_send_ack(ssl,clnt_pack->order,ack);
+	return 0;
+}
 /* scan file and send the files' list to client */
 int handle_scan_dir(SSL *ssl,SFT_PACK *clnt_pack)
 {

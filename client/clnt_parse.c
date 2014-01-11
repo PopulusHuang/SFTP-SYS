@@ -10,8 +10,7 @@
 #define BUF_SIZE 1024
 #define CLIENT_PATH  1
 #define SERVER_PATH  2
-char login_name[FILENAME_SIZE] = "\0";
-
+ACCOUNT login_user;
 /* parse the client order */
 int parse_clnt_order(SSL *ssl,int order)
 {
@@ -30,7 +29,7 @@ int parse_clnt_order(SSL *ssl,int order)
 		case CLIST:  scan_main(ssl,order);break;
 		case   CUP:  upload_files(ssl,order);break;
 		case CDOWN:  download_files(ssl,order);break;
-		case CALTER_PASSWD: modify_passwd(ssl,order);break;
+		case CMODIFY_PASSWD: modify_passwd(ssl,order);break;
 		case CONSOLE:	console(ssl,order);break;
 		case  COUT:  ret=logout(ssl,order);break;
 		default:     fprintf(stderr,"null order!\n");	
@@ -40,6 +39,33 @@ int parse_clnt_order(SSL *ssl,int order)
 }
 int modify_passwd(SSL *ssl,int order)
 {
+	ACCOUNT user;
+	int ack;
+	modify_passwd_ui();
+	echo_mode(STDIN_FILENO,ECHO_OFF);	/* set echo off */
+	printf(YELLOW"Old Password: ");	
+	fgets(user.passwd,PASSWD_SIZE,stdin);	
+	user.passwd[strlen(user.passwd)-1] = '\0';
+	/* verify old password */
+	if(strcmp(login_user.passwd,user.passwd) == 0)
+	{
+		printf("\nNew Passwd: ");
+		fgets(user.passwd,PASSWD_SIZE,stdin);	
+		user.passwd[strlen(user.passwd)-1] = '\0';
+		strcpy(user.name,login_user.name);
+		account_send(ssl,user,order);	
+	}
+	else
+	{
+		printf(RED"\nPassword error!\n"NONE);
+	}
+	ack = sftpack_recv_ack(ssl,order);	
+	if( ack == PASSWD_OK)
+	{
+		printf("\nPasswd modify succeed!\n");	
+		login_user=user;
+	}
+	echo_mode(STDIN_FILENO,ECHO_ON);	/* set echo off */
 	return 0;
 }
 int console(SSL *ssl,int order)
@@ -79,8 +105,8 @@ pwloop:	account_input(account.passwd,"\nPasswd: ",PASSWD_SIZE);
 		{
  			/* entry succeed */
  			case USER_OK:	ret = LOGIN_OK;
-							bzero(login_name,NAME_SIZE);
-							strcpy(login_name,account.name);
+							bzero(login_user.name,NAME_SIZE);
+							login_user = account;
 							break;	 	
  			/* user not exist */
  			case USER_ERROR: fprintf(stderr,
@@ -229,7 +255,7 @@ int scan_serv_files(SSL *ssl,int order)
 			fprintf(stderr,"Path error:deny contain '..'\n");	
 			return -1;
 		}
-		sprintf(scan_path,"%s/%s",login_name,path);
+		sprintf(scan_path,"%s/%s",login_user.name,path);
 		list_server(ssl,order,scan_path," -lhgaoF ");
 	}
 	return 0;
@@ -277,7 +303,7 @@ int upload_files(SSL *ssl,int order)
 	}
 	file_size = sftfile_get_size(filename);
 	cut_path(filename);
-	sprintf(data.file_attr.name,"%s/%s",login_name,filename);
+	sprintf(data.file_attr.name,"%s/%s",login_user.name,filename);
 	data.file_attr.size = file_size;
 	//strcpy(data.file_attr.name,filename);
 	/* package data and send */
@@ -327,8 +353,8 @@ int download_files(SSL *ssl,int order)
 		fprintf(stderr,"filename error: deny contain '..'\n");	
 		return -1;
 	}
-	//sprintf(serv_path,"%s/%s",login_name,filename);
-	sprintf(data.file_attr.name,"%s/%s",login_name,filename);
+	//sprintf(serv_path,"%s/%s",login_user.name,filename);
+	sprintf(data.file_attr.name,"%s/%s",login_user.name,filename);
 
 	cut_path(filename);
 	sprintf(localname,"%s%s",local_path,filename);
@@ -374,9 +400,9 @@ int logout(SSL *ssl,int order)
 		/* inform server who want to bye */
 		pack.order = order;
 		pack.ack = ASK;
-		strcpy(pack.data.user.name,login_name);	
+		strcpy(pack.data.user.name,login_user.name);	
 		sftpack_send(ssl,&pack);
-		printf("%s logout \n",login_name);
+		printf("%s logout \n",login_user.name);
 		rtn = COUT;
 	}
 	return rtn;
@@ -400,7 +426,7 @@ int scan_all(SSL *ssl)
 {
 		system("clear");
 printf(GREEN_BG"|                             Sever List                          |"NONE"\n");           
-	list_server(ssl,49,login_name,"-x");	
+	list_server(ssl,49,login_user.name,"-x");	
 	divline_ui();
 
 printf(GREEN_BG"|                             Client List                         |"NONE"\n");           

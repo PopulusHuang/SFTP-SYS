@@ -12,7 +12,7 @@
 #define CLIST		 	43	/* list file */
 #define CUP 		 	44
 #define CDOWN 		 	45
-#define CALTER_PASSWD   46	 
+#define CMODIFY_PASSWD  46	 
 #define CONSOLE			47
 #define COUT 			48
 #define CSCS 		 	49  /* scan server file */

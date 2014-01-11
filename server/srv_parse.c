@@ -17,12 +17,13 @@ int parse_clnt_pack(SSL *ssl,SFT_PACK *clnt_pack,sqlite3 *db)
 	{
 		case   CIN:	 handle_login(ssl,clnt_pack,db);break;	
 		case  CREG:	 handle_register(ssl,clnt_pack,db);break;
+		case  CMODIFY_PASSWD:	handle_modify_passwd(ssl,clnt_pack,db);break; 
 		case  CSCS:	 handle_scan_dir(ssl,clnt_pack);break;
 		case   CUP:  handle_recv_file(ssl,clnt_pack);break;
 		case CDOWN:	 handle_send_file(ssl,clnt_pack);break;
 		case  COUT:  handle_logout(ssl,clnt_pack);
 					 ret=COUT;break;
-		default:  fprintf(stderr,"%d:null order:!\n",n);
+		default:  fprintf(stderr,"%d:null order:!\n",clnt_pack->order);
 					 	ret = -1;break;
 	}
 	return ret;
