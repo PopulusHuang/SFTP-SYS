@@ -1,5 +1,6 @@
-#ifndef _ECHO_MODE_
-#define _ECHO_MODE_
+/* echo_mode.h*/
+#ifndef _ECHO_MODE_H_
+#define _ECHO_MODE_H_
 #include <termios.h>   
 #include <unistd.h>   
 #include <errno.h>   

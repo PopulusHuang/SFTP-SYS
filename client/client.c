@@ -106,6 +106,7 @@ int show_Mmain(SSL *ssl)
 	while(1)
 	{
 //		logo_ui();
+		primary_ui();
 		order = Mmain();	
 		order = parse_clnt_order(ssl,order);
 		if(order == COUT)	/* client logout */
@@ -156,7 +157,8 @@ int main(int argc, char **argv)
   int n = show_Mlogin(ssl);
 	if(n == 1)
 	{
-		system("clear");
+	//	system("clear");
+		
 		show_Mmain(ssl);
 	}
 	else if(n < 0) 

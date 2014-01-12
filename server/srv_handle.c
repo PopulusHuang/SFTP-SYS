@@ -56,7 +56,6 @@ int handle_scan_dir(SSL *ssl,SFT_PACK *clnt_pack)
 
 	order = clnt_pack->order;
 	sprintf(path,"%s%s",user_root,clnt_pack->buf);
-	printf("get client path: %s\n",path);
 	if(access(path,F_OK) != 0) /* path not exist */
 	{
 		sftpack_send_ack(ssl,order,PATH_ERR);
@@ -68,18 +67,43 @@ int handle_scan_dir(SSL *ssl,SFT_PACK *clnt_pack)
 	list_send_print(ssl,order,cmd_buf);
 	return 0;
 }
+int	handle_write_log(char *logmsg) 
+{
+	int fd;
+	fd = open("./sftp.log",O_CREAT|O_RDWR|O_APPEND,0666);
+	if(fd < 0)
+	{
+		perror("open sftp.log:");	
+		return -1;
+	}
+	Write(fd,logmsg,strlen(logmsg));
+	return 0;
+}
+int handle_get_date(char *date,int date_size)
+{
+	FILE *date_stream;
+	date_stream = popen("date","r");
+	while(fgets(date,date_size,date_stream) != NULL)
+			;
+	date[strlen(date)-1] = '\0';
+	pclose(date_stream);
+	return 0;
+}
 int handle_recv_file(SSL *ssl,SFT_PACK *clnt_pack)
 {
 	int fd;
 	char *path = "./User/";
 	char filename[FILENAME_SIZE];
+	char logmsg[DATA_SIZE];
+	char date[40];
 	int file_size = 0;
 	int order;
-
-	bzero(filename,sizeof(filename));
-
+	bzero(date,sizeof(date));
+	memset(filename,0,sizeof(filename));
+	memset(logmsg,0,sizeof(logmsg));
 	order = clnt_pack->order;	
 	file_size = clnt_pack->data.file_attr.size;
+
 	if(clnt_pack->ack == ASK)
 	{
 		sprintf(filename,"%s%s",path,clnt_pack->data.file_attr.name);
@@ -99,6 +123,11 @@ int handle_recv_file(SSL *ssl,SFT_PACK *clnt_pack)
 		if(sftfile_recv(ssl,order,fd,file_size)==0)
 		{
 			sftpack_send_ack(ssl,order,FINISH);
+			/* write log*/
+			handle_get_date(date,40);
+			sprintf(logmsg,"Client:%s\n\tUpload date:%s\n\tFile name:%s\n\tFile size:%0.0fKB\n",
+					clnt_pack->buf,date,filename,(float)file_size/1024);
+			handle_write_log(logmsg);
 		}
 	}
 	return 0;

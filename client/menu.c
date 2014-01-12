@@ -1,3 +1,4 @@
+/*menu.c*/
 #include "menu.h"
 #include "../share/ui.h"
 #include <assert.h>
@@ -14,7 +15,7 @@ int get_order(int n,int min,int max)
 	}
 	else
 	{
-		printf(RED"Please input a number between %d and %d ! Or input a negative to quit.\n"NONE,min,max);
+		printf(RED"Please input a number between %d and %d ! Or enter a negative to exit.\n"NONE,min,max);
 		order = CNULL;
 	}
 	return order;
@@ -23,8 +24,13 @@ int get_order(int n,int min,int max)
 int Moption(void)
 {
 	int n;
-	printf(RED"Please input a number: "NONE);
+	printf(YELLOW"Please input a number: "NONE);
 	scanf("%d",&n);
+	if(n < 0)
+	{
+		printf(RED"Warning:Negative argument,exit now...\n"NONE);
+		exit(1);
+	}
 	getchar();
 	return n;
 }
@@ -37,7 +43,6 @@ int Mlogin(void)
 		start_ui();
 		int n = Moption();	
 		order = get_order(n,1,2);
-		assert(order);
 	}while(order == CNULL);
 	return order;
 }
@@ -48,11 +53,10 @@ int Mmain(void)
 	  int n;
 	  do
 	  {
-		primary_ui();
+		//primary_ui();
 		n = Moption() + 2;	
 		if( n > 2 && n < 9)
 			order = order_set[n];
-		assert(order);
 	  }while(order == CNULL);
 	return order;
 }
@@ -64,16 +68,14 @@ int Mlist(void)
 	{
 		list_ui();
 		n = Moption() + 8;
-		printf("Mlist:n=%d\n",n);
 		if(n > 8&& n < 13)
 		{
 			order = order_set[n];
 		}
 		else
 		{
-			printf(RED"Please input a number between %d and %d ! Or input a negative to quit.\n"NONE,1,3);
+			printf(RED"Please input a number between %d and %d ! Or enter a negative to exit.\n"NONE,1,3);
 		}
-		assert(order);
 	}while(order == CNULL);
 	return order;
 }

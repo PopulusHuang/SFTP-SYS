@@ -8,7 +8,7 @@ obj_list=../share/list.o ../share/ui.o
 obj_parse=srv_parse.o
 obj_all=$(obj_srv) $(obj_ssl) $(obj_sock) $(obj_parse) $(obj_file) $(obj_account) $(obj_pack) $(obj_list)
 CC=gcc
-CFLAGS= -lssl -lcrypto -lsqlite3 -g -rdynamic#-fno-stack-protector
+CFLAGS= -lssl -lcrypto -lsqlite3 -g -rdynamic 
 ssl_server:$(obj_all)
 	$(CC) -o $@ $(obj_all) $(CFLAGS)
 clean:

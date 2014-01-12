@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "account.h"
+#include "ui.h"
 #include "sftpack.h"
 #define BUF_SIZE 1024
 
@@ -13,10 +14,11 @@
  * */
 int account_input(char *account,char *prompt_info,int size)  
 {  
-   printf("%s",prompt_info);	/* print prompt information */
+   printf(YELLOW"%s"NONE,prompt_info);	/* print prompt information */
    fgets(account,size,stdin);
    int n = strlen(account);
    account[n-1] = '\0';
+   printf("\n");
    return n;  
 }  
 /* verify user's name and passwd */
