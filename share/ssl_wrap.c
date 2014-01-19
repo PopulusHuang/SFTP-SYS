@@ -36,13 +36,11 @@ int ssl_load_pk(SSL_CTX *ctx, char *certificate, char *privateKey)
         return -1;
     }
 }
-int ssl_close_pk(SSL_CTX *ctx, SSL *ssl, int sockfd, int new_fd)
+int ssl_close_pk(SSL_CTX *ctx, SSL *ssl, int sockfd)
 {
-    if (NULL == ctx || NULL == ssl || sockfd < 0 || new_fd < 0) return -1;
+    if (NULL == ctx || NULL == ssl || sockfd < 0 ) return -1;
     SSL_shutdown(ssl);
     SSL_free(ssl);
-    if (new_fd)
-        close(new_fd);
     close(sockfd);
     SSL_CTX_free(ctx);
     return 0;

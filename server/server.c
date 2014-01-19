@@ -169,8 +169,9 @@ int main(int argc, char **argv)
 		  }
 	  }
   }
-
-  close(sockfd);
-  SSL_CTX_free(ctx);
+  
+  ssl_close_pk(ctx, ssl,sockfd)
+//  close(sockfd);
+// SSL_CTX_free(ctx);
   return 0;
 }

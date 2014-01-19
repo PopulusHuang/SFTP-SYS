@@ -4,13 +4,12 @@
 #include "../share/list.h"
 #include "../share/sftpack.h"
 #include "../share/ui.h"
+#include "console.h"
+#include "command.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #define BUF_SIZE 1024
-#define CLIENT_PATH  1
-#define SERVER_PATH  2
-ACCOUNT LOGIN_USER;
 /* parse the client order */
 int parse_clnt_order(SSL *ssl,int order)
 {
@@ -30,7 +29,7 @@ int parse_clnt_order(SSL *ssl,int order)
 		case   CUP:  upload_files(ssl,order);break;
 		case CDOWN:  download_files(ssl,order);break;
 		case CMODIFY_PASSWD: modify_passwd(ssl,order);break;
-		case CONSOLE:	console(ssl,order);break;
+		case CONSOLE:	console(ssl);break;
 		case  COUT:  ret=logout(ssl,order);break;
 		default:     fprintf(stderr,"null order!\n");	
 					 	ret = -1;break;
@@ -68,6 +67,7 @@ int modify_passwd(SSL *ssl,int order)
 	echo_mode(STDIN_FILENO,ECHO_ON);	/* set echo off */
 	return 0;
 }
+#if 0
 int console(SSL *ssl,int order)
 {
 	char buf[BUF_SIZE];
@@ -84,6 +84,7 @@ int console(SSL *ssl,int order)
 	}
 	return 0;
 }
+#endif
 /* handle client login */
 int clnt_login(SSL *ssl,int order)
 {
@@ -300,11 +301,16 @@ int upload_files(SSL *ssl,int order)
 	SFT_PACK pack;
 	SFT_DATA data;
 	char filename[FILENAME_SIZE];
+	char *line = NULL;
 	int file_size;
+
+	bzero(filename,sizeof(filename));
 	/* scan local and server files */
 	scan_all(ssl);
 	/* get file name*/
-	sftfile_get_name(filename,"Upload");
+	//sftfile_get_name(filename,"Upload");
+	line = readline("Upload file name>>");	
+	strncpy(filename,line,FILENAME_SIZE);
     /* open the local file */
 	fd = sftfile_open(filename,O_RDONLY);
 	if(fd < 0)
@@ -332,7 +338,7 @@ int upload_files(SSL *ssl,int order)
 	 {
 	 	printf("upload %s to sever succeed,total %0.1fKB\n",
 	   	filename,(float)file_size/1024);
-		list_server(ssl,49,LOGIN_USER.name,"-xF");	
+		list_server(ssl,CSCS,LOGIN_USER.name,"-xF");	
 		divline_ui();
 	 }
 	 else
@@ -353,13 +359,12 @@ int download_files(SSL *ssl,int order)
 	int ack,fd;
 	char filename[FILENAME_SIZE];
 	char localname[FILENAME_SIZE];
-	char *local_path = "./SFT_DOWNLOAD/";
 	SFT_PACK pack;
 	SFT_DATA data;
 
 	/* scan local and server files */
 	scan_all(ssl);
-	sftfile_userdir(local_path);
+	sftfile_userdir(DOWNLOAD_DIR);
 	bzero(localname,sizeof(localname));
 	/* input filename on server to download */
 	sftfile_get_name(filename,"Download");
@@ -372,7 +377,7 @@ int download_files(SSL *ssl,int order)
 	sprintf(data.file_attr.name,"%s/%s",LOGIN_USER.name,filename);
 
 	cut_path(filename);
-	sprintf(localname,"%s%s",local_path,filename);
+	sprintf(localname,"%s%s",DOWNLOAD_DIR,filename);
 	/*send file information to server */
 	sftpack_wrap(&pack,order,ASK,"");	
 	pack.data = data;
@@ -388,7 +393,7 @@ int download_files(SSL *ssl,int order)
 		{
 			//size = sftfile_get_size(localname);	
 			printf("Downlad %s succeed\n",filename);
-			list_client("./SFT_DOWNLOAD/"," --color=auto ");
+			list_client(DOWNLOAD_DIR," --color=auto ");
 			divline_ui();
 		}	
 		else
@@ -439,11 +444,12 @@ int scan_main(SSL *ssl)
 	}
 	return 0;
 }
+/* scan client and server files both*/
 int scan_all(SSL *ssl)
 {
 	system("clear");
 	logo_ui();
 	list_server(ssl,49,LOGIN_USER.name,"-xF");	
-	list_client("./SFT_DOWNLOAD/"," --color=auto ");
+	list_client(DOWNLOAD_DIR," --color=auto ");
 //	divline_ui();
 }

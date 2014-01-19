@@ -1,7 +1,11 @@
 #ifndef _CLNT_PARSE_H_
 #define _CLNT_PARSE_H_
+
 #include "menu.h"
 #include "../share/ssl_wrap.h"
+#include "../share/account.h"
+#define DOWNLOAD_DIR	"./SFT_DOWNLOAD/"
+ACCOUNT LOGIN_USER;
 int clnt_login(SSL *ssl,int order);
 int clnt_register(SSL *ssl,int order);
 int cut_path(char *filename);
@@ -15,5 +19,4 @@ void scan_local_files(void);
 int scan_serv_files(SSL *ssl,int order);
 int upload_files(SSL *ssl,int order);
 int modify_passwd(SSL *ssl,int order);
-int console(SSL *ssl,int order);
 #endif
