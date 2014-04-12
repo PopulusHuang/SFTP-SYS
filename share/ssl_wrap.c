@@ -3,14 +3,6 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
-#if 0
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#endif
 /* load  secret key and  verify */
 int ssl_load_pk(SSL_CTX *ctx, char *certificate, char *privateKey)
 {
@@ -65,28 +57,17 @@ int SSL_read_pk(SSL *ssl, void *buf, int num)
 	}
 	return n;
 }
-/* current path */
-void Getcwd(char *pwd,int size)
-{
-	getcwd(pwd,size);
-  	if(strlen(pwd)==1)
-	{
-		pwd[0]='\0';
-	}
-}
 /* Load the user's digital certificate of current 
  * directory that is used to send to the client. 
  * A certificate containing a public key*/
-void ssl_load_cert_priv(SSL_CTX *ctx)
+void ssl_load_cert_priv(SSL_CTX *ctx,char *path,char *cacert,char *privkey)
 {
-  char certpwd[100];
-  char privpwd[100];
-  char *certificate;
-  char *privkey;
+  char cacert_path[100];
+  char privkey_path[100];
   /* get the current path */
-  Getcwd(certpwd,100);
-  certificate=strcat(certpwd,"/cacert.pem");
-  Getcwd(privpwd,100);
-  privkey=strcat(privpwd,"/privkey.pem");
-  ssl_load_pk(ctx,certificate,privkey);
+  memset(cacert_path,0,sizeof(cacert_path));
+  memset(privkey_path,0,sizeof(privkey_path));
+  sprintf(cacert_path,"%s%s",path,cacert);
+  sprintf(privkey_path,"%s%s",path,privkey);
+  ssl_load_pk(ctx,cacert_path,privkey_path);
 }

@@ -12,7 +12,6 @@
 /* String to pass to system ().  This is for the LIST,
  * VIEW and RENAME commands. */
 static char syscmd[1024];
-
 COMMAND commands[] = {
   { "cd", cmd_cd, "[DIR]\n\t--Change to directory DIR" },
   { "delete", cmd_delete, "--Delete FILE" },

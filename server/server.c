@@ -5,16 +5,59 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "srv_parse.h"
-#include "../share/ssl_wrap.h"
-#include "../share/sock_wrap.h"
+#include "ssl_wrap.h"
+#include "sock_wrap.h"
 #include "myepoll.h"
 #include "sockssl.h"
+#include "read_cfg.h"
+#define DB_PATH	  "../database/sft_user.db"
+#define	CERTIFICATE_DIR   "certificate/"
+#define CACERT	"cacert.pem"
+#define PRIVKEY	"privkey.pem"
 #define MAXBUF 1024
-#define SERV_PORT 7838
 #define MAX_EVENT 100
-void arg_init(char **argv,int *lisnum,int *myport)
+#define CONFIG_SIZE 5
+
+#define CFG_LOCALADDR 0
+#define CFG_IP  1
+#define CFG_PORT 2 
+#define CFG_LISTEN 3 
+int LISTEN_NUM = 20;
+char KEY[CONFIG_SIZE][CFG_KEY_SIZE] = {"INADDR_ANY","IP","PORT","LISTEN"};
+char VALUE[CONFIG_SIZE][CFG_VALUE_SIZE];
+void server_config()
 {
-  /* set port */
+	FILE *cfg_file = NULL;	
+	sftpcfg_t config;
+	char key[CFG_KEY_SIZE];
+	char value[CFG_VALUE_SIZE];
+
+	memset(key,0,sizeof(key));
+	memset(value,0,sizeof(value));
+
+	cfg_file = fopen("sftp-sys.conf","r");
+	if(cfg_file == NULL)
+	{
+		fprintf(stderr,"Open configure file error!\n");		
+		exit(1);
+	}
+	config.comment_char = '#';
+	config.sep_char = '=';
+	config.key = key;
+	config.value = value;
+	int i;
+	for (i = 0; i < (CONFIG_SIZE - 1) ; i++) {
+		strcpy(key,KEY[i]);
+		cfg_readValue(cfg_file,config);
+		strcpy(VALUE[i],config.value);
+		memset(value,0,sizeof(value));
+	}
+	LISTEN_NUM = atoi(VALUE[CFG_LISTEN]);
+}
+#if 0
+void arg_init(char **argv,char *ip,int *myport,int *lisnum)
+{
+   /*set port */
   if (argv[1])
     *myport = atoi(argv[1]);
   else
@@ -27,10 +70,11 @@ void arg_init(char **argv,int *lisnum,int *myport)
     *lisnum = atoi(argv[2]);
   else
   {
-    *lisnum = 2;
+    *lisnum = LISTEN_NUM;
     argv[3]=NULL;
   }
 }
+#endif	
 int socket_init(int lisnum,char **argv)
 {
   int sockfd;
@@ -40,13 +84,17 @@ int socket_init(int lisnum,char **argv)
   setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
   bzero(&servaddr, sizeof(servaddr));
   servaddr.sin_family = PF_INET;
-  servaddr.sin_port = htons(SERV_PORT);
-  if (argv[3])
-    servaddr.sin_addr.s_addr = inet_addr(argv[3]);
+  servaddr.sin_port = htons(atoi(VALUE[CFG_PORT]));
+ // servaddr.sin_port = htons(7838);
+#if 1
+  if (strcmp(VALUE[CFG_LOCALADDR],"off") == 0)
+    servaddr.sin_addr.s_addr = inet_addr(VALUE[CFG_IP]);
   else
-    servaddr.sin_addr.s_addr = INADDR_ANY;
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+#endif
+    //servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	Bind(sockfd, (struct sockaddr *)&servaddr, sizeof(struct sockaddr));
-	Listen(sockfd, lisnum);
+	Listen(sockfd,LISTEN_NUM);
   return sockfd;
 }
 int clnt_close(SSL *ssl,SOCKSSL *sockssl,int connfd)
@@ -67,7 +115,7 @@ int main(int argc, char **argv)
 
  /* open database */ 
   sqlite3 *db;
-	ret = sqlite3_open("../database/sft_user.db",&db);
+	ret = sqlite3_open(DB_PATH,&db);
 	if(ret != SQLITE_OK)
 	{
 		fputs(sqlite3_errmsg(db),stderr);
@@ -77,7 +125,7 @@ int main(int argc, char **argv)
 /* config openssl */
   SSL_CTX *ctx; /*SSL Content Text*/
 	
-  arg_init(argv,&lisnum,&myport);
+  //arg_init(argv,&lisnum,&myport);
 #if 1
   SSL_library_init();
  
@@ -97,8 +145,9 @@ int main(int argc, char **argv)
   puts("ssl init");
   sftfile_userdir("./User");
 
-  ssl_load_cert_priv(ctx);
+  ssl_load_cert_priv(ctx,CERTIFICATE_DIR,CACERT,PRIVKEY);
   /*---------- setup a socket monitor-----------------*/
+  server_config();
   sockfd = socket_init(lisnum,argv);
   int i; 
   int epfd;	/* epoll file describes */
@@ -121,10 +170,10 @@ int main(int argc, char **argv)
   {
 	  /* wait for events */
 	  all_event_num = Epoll_wait(epfd,events,cur_event_num,-1);
-	  /* handl all events */
+	  /* handle all events */
 	  for(i = 0;i < all_event_num;i++)
 	  {
-		  if(events[i].data.fd == sockfd)
+		  if(events[i].data.fd == sockfd) /*new connection*/
 		  {
 	         int new_connfd = Accept(sockfd, (struct sockaddr *) &their_addr, &len);
              printf("server: got connection from %s, port %d, socket %d\n", 
@@ -147,7 +196,7 @@ int main(int argc, char **argv)
 			 Event_add(epfd,new_connfd,&ev);
 			 cur_event_num++;
 		  }
-		  else 
+		  else 	
 		  {
 			int n,nread;
 			 connfd = events[i].data.fd; 
@@ -170,8 +219,8 @@ int main(int argc, char **argv)
 	  }
   }
   
-  ssl_close_pk(ctx, ssl,sockfd)
-//  close(sockfd);
-// SSL_CTX_free(ctx);
+  ssl_close_pk(ctx, ssl,sockfd);
+  sqlite3_close(db);
+  SSL_CTX_free(ctx);
   return 0;
 }

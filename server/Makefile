@@ -1,16 +1,24 @@
-obj_srv=server.o srv_handle.o myepoll.o sockssl.o
-obj_ssl=../share/ssl_wrap.o
-obj_sock=../share/sock_wrap.o
-obj_account=../share/account.o
-obj_pack=../share/sftpack.o
-obj_file=../share/sftfile.o
-obj_list=../share/list.o ../share/ui.o 
-obj_parse=srv_parse.o
-obj_all=$(obj_srv) $(obj_ssl) $(obj_sock) $(obj_parse) $(obj_file) $(obj_account) $(obj_pack) $(obj_list)
-CC=gcc
-CFLAGS= -lssl -lcrypto -lsqlite3 -g -rdynamic 
-ssl_server:$(obj_all)
-	$(CC) -o $@ $(obj_all) $(CFLAGS)
+SERVER_OBJS = server.o \
+			  srv_handle.o \
+			  myepoll.o \
+			  sockssl.o \
+			  srv_parse.o \
+			  read_cfg.o
+SHAREDIR = $(shell pwd)/../share/
+INCPATH = -I$(SHAREDIR)
+SHARED_OBJS = $(SHAREDIR)sock_wrap.o \
+			  $(SHAREDIR)sftpack.o \
+			  $(SHAREDIR)sftfile.o \
+			  $(SHAREDIR)list.o	\
+			  $(SHAREDIR)ui.o	\
+			  $(SHAREDIR)account.o \
+			  $(SHAREDIR)ssl_wrap.o
+ALL_OBJS = $(SERVER_OBJS) $(SHARED_OBJS)
+CC = gcc
+CFLAGS = -lssl -lcrypto -lsqlite3 -g -rdynamic $(INCPATH) 
+TARGET = ssl_server
+$(TARGET):$(ALL_OBJS)
+	$(CC) -o $@ $(ALL_OBJS) $(CFLAGS)
 clean:
 	rm -rf *.o
-	rm -rf ssl_server
+	rm -rf $(TARGET)

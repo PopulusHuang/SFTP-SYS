@@ -311,6 +311,7 @@ int upload_files(SSL *ssl,int order)
 	//sftfile_get_name(filename,"Upload");
 	line = readline("Upload file name>>");	
 	strncpy(filename,line,FILENAME_SIZE);
+	free(line);
     /* open the local file */
 	fd = sftfile_open(filename,O_RDONLY);
 	if(fd < 0)

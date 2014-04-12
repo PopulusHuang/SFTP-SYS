@@ -7,10 +7,10 @@
 #include <fcntl.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
-#include "../share/ssl_wrap.h"
-#include "../share/sock_wrap.h"
-#include "../share/sftpack.h"
-#include "../share/ui.h"
+#include "ssl_wrap.h"
+#include "sock_wrap.h"
+#include "sftpack.h"
+#include "ui.h"
 #include "clnt_parse.h"
 #define MAXBUF 1024
 #define SERV_PORT 7838
@@ -42,33 +42,28 @@ void print_error()
 			errno, strerror(errno));
 }
 /* initial server's socket */
-int sock_init(void)
+int sock_init(char *server_ip,int server_port)
 {
   int sockfd;
   struct sockaddr_in servaddr;
   int len;
-  char *ip = "127.0.0.1";
+  //char *ip = "127.0.0.1";
   sockfd = Socket(AF_INET, SOCK_STREAM, 0);
 
   /* initial server's address and port */
   bzero(&servaddr,sizeof(servaddr));
   servaddr.sin_family = AF_INET;
-  servaddr.sin_port = htons(SERV_PORT);//htons(atoi(argv[2]));
- // servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-  inet_pton(AF_INET,ip,&servaddr.sin_addr);
-#if 0
-  if (inet_aton("127.0.0.1", (struct in_addr *)servaddr.sin_addr.s_addr) == 0)
+  servaddr.sin_port = htons(server_port);//htons(atoi(argv[2]));
+  if(inet_pton(AF_INET,server_ip,&servaddr.sin_addr) < 0)
   {
-    //perror(argv[1]);
-    exit(errno);
+ 	perror("server ip error"); 
+	exit(errno);
   }
-#endif
-  printf("address created\n");
 
   /* Connect to server */
-  len =sizeof(servaddr);
+  len = sizeof(servaddr);
   Connect(sockfd,(struct sockaddr *)&servaddr,len);
-  printf("server connected\n\n");
+  printf("Server connected successfully !\n\n");
   return sockfd;
 }
 int show_Mlogin(SSL *ssl)
@@ -123,7 +118,7 @@ int main(int argc, char **argv)
 #if 0
   if (argc != 3)
   {
-    printf("Usage：\n\t\t%s IP Port\n\tSuch as:\t%s 127.0.0.1 80\n", argv[0], argv[0]);
+    printf("Usage：%s IP Port\n\tSuch as:\t%s 127.0.0.1 80\n", argv[0], argv[0]);
 	exit(0);
   }
 #endif
@@ -139,7 +134,7 @@ int main(int argc, char **argv)
     exit(1);
   }
   /*create a socket*/
-  sockfd = sock_init();
+  sockfd = sock_init("127.0.0.1",7838);
   /* create a ssl with */
   ssl = SSL_new(ctx);
   SSL_set_fd(ssl, sockfd);

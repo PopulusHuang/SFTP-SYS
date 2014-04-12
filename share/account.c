@@ -41,7 +41,7 @@ int account_verify(sqlite3 *db,char *username,char *passwd)
 		printf("%s is not exist!\n",username);
 		return USER_ERROR;
 	}
-		printf("%s is exist!\n",username);
+		//printf("%s is exist!\n",username);
 	if(passwd != NULL)	/* verify passwd */
 	{
 		for (i = 0;i < (row+1)*col;i++)
@@ -49,7 +49,6 @@ int account_verify(sqlite3 *db,char *username,char *passwd)
 			if(strcmp(aResult[i],passwd) == 0)
 			{
 				/* match the password */
-		//		printf("the passwd is:%s\n",aResult[i]);
 				return USER_OK;
 			}
 		}
@@ -129,7 +128,6 @@ void cut_blank(char *src,char *dest)
 			dest[j++] = src[i];
 		}
 	}
-	//dest[j] = '\0';
 }
 /* send account to server */
 int account_send(SSL *ssl,ACCOUNT user,int order)

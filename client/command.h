@@ -1,6 +1,6 @@
 #ifndef _COMMAND_H_
 #define _COMMAND_H_
-#include "../share/ssl_wrap.h"
+#include "ssl_wrap.h"
 #include <readline/readline.h>
 #include <readline/history.h>
 typedef struct {
