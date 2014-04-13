@@ -2,8 +2,7 @@
 #define _CLNT_PARSE_H_
 
 #include "menu.h"
-#include "ssl_wrap.h"
-#include "account.h"
+#include "sftpack.h"
 #define DOWNLOAD_DIR	"./SFT_DOWNLOAD/"
 ACCOUNT LOGIN_USER;
 int clnt_login(SSL *ssl,int order);

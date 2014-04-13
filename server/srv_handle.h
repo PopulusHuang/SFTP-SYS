@@ -1,8 +1,8 @@
 #ifndef _HANDLE_H_
 #define _HANDLE_H_
-#include "../share/ssl_wrap.h"
-#include "../share/sock_wrap.h"
-#include "../share/sftpack.h"
+#include "ssl_wrap.h"
+#include "sock_wrap.h"
+#include "sftpack.h"
 #include <sqlite3.h>
 int handle_login(SSL *ssl,SFT_PACK *clnt_pack,sqlite3 *db);
 void handle_logout(SSL *ssl,SFT_PACK *clnt_pack);

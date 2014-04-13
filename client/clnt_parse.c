@@ -1,9 +1,23 @@
-/*clnt_parse.c*/
+/*
+ * ========================================================================
+ *
+ *       Filename:  clnt_parse.c
+ *
+ *    Description:  parse clients' order and send request to server 
+ *
+ *        Version:  1.0
+ *           Date:  04/12/14 09:05:11 PM
+ *       Compiler:  gcc-4.6.3
+ *
+ *         Author:  Populus Huang 
+ *          Email:  thoughtsonlive@gmail.com
+ *
+ * ========================================================================
+ */
 #include "clnt_parse.h"
 #include "echo_mode.h"
-#include "../share/list.h"
-#include "../share/sftpack.h"
-#include "../share/ui.h"
+#include "list.h"
+#include "ui.h"
 #include "console.h"
 #include "command.h"
 #include <sys/types.h>
@@ -67,24 +81,6 @@ int modify_passwd(SSL *ssl,int order)
 	echo_mode(STDIN_FILENO,ECHO_ON);	/* set echo off */
 	return 0;
 }
-#if 0
-int console(SSL *ssl,int order)
-{
-	char buf[BUF_SIZE];
-	memset(buf,0,sizeof(buf));
-	printf(RED"Enter 'help' to see help."NONE"\n");
-	while(1)
-	{
-		printf(">>");
-		fgets(buf,BUF_SIZE-1,stdin);
-		buf[strlen(buf)-1] = '\0';
-		if(strcmp(buf,"exit") == 0)
-			break;
-		system(buf);
-	}
-	return 0;
-}
-#endif
 /* handle client login */
 int clnt_login(SSL *ssl,int order)
 {
@@ -452,5 +448,4 @@ int scan_all(SSL *ssl)
 	logo_ui();
 	list_server(ssl,49,LOGIN_USER.name,"-xF");	
 	list_client(DOWNLOAD_DIR," --color=auto ");
-//	divline_ui();
 }

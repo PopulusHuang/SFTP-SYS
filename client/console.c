@@ -1,4 +1,21 @@
-/*console.c*/
+
+/*
+ * ========================================================================
+ *
+ *       Filename:  console.c
+ *
+ *    Description:  Console processing
+ *
+ *        Version:  1.0
+ *           Date:  04/12/14 09:10:17 PM
+ *       Compiler:  gcc-4.6.3
+ *
+ *         Author:  Populus Huang 
+ *          Email:  thoughtsonlive@gmail.com
+ *
+ * ========================================================================
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -108,7 +125,6 @@ int console(SSL *ssl)
           add_history (s);/* add the command to history */
           execute_line (s);
         }
-
       free (line);
     }
   return 0;

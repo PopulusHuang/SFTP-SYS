@@ -1,10 +1,10 @@
 /*menu.c*/
 #include "menu.h"
-#include "../share/ui.h"
+#include "ui.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "../share/sftpack.h"
+#include "sftpack.h"
 int get_order(int n,int min,int max)
 {
 	int order;	

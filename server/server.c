@@ -10,7 +10,7 @@
 #include "myepoll.h"
 #include "sockssl.h"
 #include "read_cfg.h"
-#define DB_PATH	  "../database/sft_user.db"
+#define DB_PATH	  "../database/sftp_user.db"
 #define	CERTIFICATE_DIR   "certificate/"
 #define CACERT	"cacert.pem"
 #define PRIVKEY	"privkey.pem"
@@ -54,27 +54,6 @@ void server_config()
 	}
 	LISTEN_NUM = atoi(VALUE[CFG_LISTEN]);
 }
-#if 0
-void arg_init(char **argv,char *ip,int *myport,int *lisnum)
-{
-   /*set port */
-  if (argv[1])
-    *myport = atoi(argv[1]);
-  else
-  {
-    *myport = SERV_PORT;
-    argv[2]=argv[3]=NULL;
-  }
-  /*set listen backlog */
-  if (argv[2])
-    *lisnum = atoi(argv[2]);
-  else
-  {
-    *lisnum = LISTEN_NUM;
-    argv[3]=NULL;
-  }
-}
-#endif	
 int socket_init(int lisnum,char **argv)
 {
   int sockfd;
@@ -85,14 +64,12 @@ int socket_init(int lisnum,char **argv)
   bzero(&servaddr, sizeof(servaddr));
   servaddr.sin_family = PF_INET;
   servaddr.sin_port = htons(atoi(VALUE[CFG_PORT]));
- // servaddr.sin_port = htons(7838);
 #if 1
   if (strcmp(VALUE[CFG_LOCALADDR],"off") == 0)
     servaddr.sin_addr.s_addr = inet_addr(VALUE[CFG_IP]);
   else
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 #endif
-    //servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	Bind(sockfd, (struct sockaddr *)&servaddr, sizeof(struct sockaddr));
 	Listen(sockfd,LISTEN_NUM);
   return sockfd;
@@ -125,7 +102,6 @@ int main(int argc, char **argv)
 /* config openssl */
   SSL_CTX *ctx; /*SSL Content Text*/
 	
-  //arg_init(argv,&lisnum,&myport);
 #if 1
   SSL_library_init();
  

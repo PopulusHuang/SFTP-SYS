@@ -7,9 +7,6 @@
 #include <fcntl.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
-#include "ssl_wrap.h"
-#include "sock_wrap.h"
-#include "sftpack.h"
 #include "ui.h"
 #include "clnt_parse.h"
 #define MAXBUF 1024

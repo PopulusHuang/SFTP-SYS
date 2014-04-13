@@ -1,12 +1,24 @@
-/* *********************************************** * 
- *                                                 * 
- *   command.c:   SFTP  Commands                   * 
- *                                                 * 
- * *********************************************** */
+/*
+ * ========================================================================
+ *
+ *       Filename:  command.c
+ *
+ *    Description:  SFTP-SYS console command, depend on readline library.
+ *
+ *        Version:  1.0
+ *           Date:  04/12/14 09:11:08 PM
+ *       Compiler:  gcc-4.6.3
+ *
+ *         Author:  Populus Huang 
+ *          Email:  thoughtsonlive@gmail.com
+ *
+ * ========================================================================
+ */
+
 #include "command.h"
 #include "clnt_parse.h"
-#include "../share/sftpack.h"
-#include "../share/sftfile.h"
+#include "sftpack.h"
+#include "sftfile.h"
 #include <fcntl.h>
 #include <sys/stat.h>
 /* String to pass to system ().  This is for the LIST,

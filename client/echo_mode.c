@@ -1,13 +1,30 @@
-/* echo_mode.c*/
+
+/*
+ * ========================================================================
+ *
+ *       Filename:  echo_mode.c
+ *
+ *    Description:  Control whether to open entry Echo 
+ *
+ *        Version:  1.0
+ *           Date:  04/12/14 09:07:06 PM
+ *       Compiler:  gcc-4.6.3
+ *
+ *         Author:  Populus Huang 
+ *          Email:  thoughtsonlive@gmail.com
+ *
+ * ========================================================================
+ */
+
 #include <stdio.h>   
 #include <string.h>
 #include <termios.h>   
 #include <unistd.h>   
 #include <errno.h>   
 #include "echo_mode.h"
-/* describes: control whether to open entry Echo 
+/*  
  * argument:
- *    fd      -- a file describes you can use 
+ *    fd      -- a file describes,you can use 
  *            STDIN_FILENO or STDOUNT_FILENO 
  *    option  -- a flag to set echo on or off
  * */
